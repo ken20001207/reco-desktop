@@ -1,0 +1,64 @@
+{
+  "name": "reco-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "./",
+  "main": "main.js",
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/react-helmet": "^5.0.15",
+    "react": "^16.13.0",
+    "react-day-picker": "^7.4.0",
+    "react-dom": "^16.13.0",
+    "react-helmet": "^5.2.1",
+    "react-scripts": "3.4.0",
+    "react-transition-group": "^4.3.0",
+    "rsuite": "^4.3.0"
+  },
+  "scripts": {
+    "web-start": "react-scripts start",
+    "app-start": "electron .",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "dist": "electron-builder"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/react-transition-group": "^4.2.4",
+    "electron-builder": "^22.4.0",
+    "typescript": "^3.8.3",
+    "electron": "^8.1.0"
+  },
+  "build": {
+    "appId": "com.yuanlin.reco",
+    "productName": "Reco",
+    "directories": {
+      "output": "build"
+    },
+    "mac": {
+      "icon": "icon.png"
+    },
+    "win": {
+      "icon": "icon.png"
+    },
+    "linux": {
+      "icon": "icon.png"
+    }
+  }
+}
