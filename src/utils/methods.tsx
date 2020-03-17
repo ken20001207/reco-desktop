@@ -1,17 +1,20 @@
-import { Notification, Icon } from "rsuite";
-import { Event, Calendar, Repeat, User } from "./classes";
-import React from "react";
-import { apiURL } from "./config";
+import { Notification } from 'rsuite';
+import { Event, Calendar, Repeat, User } from './classes';
+import React from 'react';
+import { apiURL } from './config';
 
 /** 更新使用者資料 */
 export function updateUserData(data: User) {
-    return fetch(apiURL + "/update", { method: "POST", body: JSON.stringify(data) });
+    return fetch(apiURL + '/update', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
 }
 
 /** 取得使用者資料 */
 export function getUserData(id: string) {
     return new Promise((resolve, reject) => {
-        fetch(apiURL + "/userdata/" + id)
+        fetch(apiURL + '/userdata/' + id)
             .then(response => response.json())
             .then(response => {
                 resolve(response);
@@ -26,13 +29,16 @@ export function getUserData(id: string) {
 /** 產生一組 UUID 給任意物件使用 */
 export function generateUUID() {
     var d = Date.now();
-    if (typeof performance !== "undefined" && typeof performance.now === "function") {
+    if (
+        typeof performance !== 'undefined' &&
+        typeof performance.now === 'function'
+    ) {
         d += performance.now();
     }
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
-        return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
 }
 
@@ -46,7 +52,15 @@ export function getEventPopoverContent(event: Event) {
 
     // Evnet Title
     popoverContent.push(
-        <h1 key="et" style={{ color: "white", fontSize: 18, lineHeight: 1.5 }}>
+        <h1
+            key="et"
+            style={{
+                color: 'white',
+                fontSize: 18,
+                fontWeight: 3000,
+                lineHeight: 1.5
+            }}
+        >
             {event.title}
         </h1>
     );
@@ -54,30 +68,28 @@ export function getEventPopoverContent(event: Event) {
     // Ignore Reason
     if (event.ignore)
         popoverContent.push(
-            <p style={{ color: "rgba(255,255,255,0.5)" }} key="ir">
-                該事件已被忽略，因為{event.ignoreReason}{" "}
+            <p style={{ color: 'rgba(255,255,255,0.5)' }} key="ir">
+                該事件已被忽略，因為{event.ignoreReason}{' '}
             </p>
         );
 
     // Duration
     if (!event.isAllDayEvent())
-        popoverContent.push(
-                <p>{event.getDurationString()}</p>
-        );
+        popoverContent.push(<p>{event.getDurationString()}</p>);
 
     // Location
-    if (event.location !== "")
+    if (event.location !== '')
         popoverContent.push(
             <p key="lc" style={{ marginTop: 10 }}>
-                {event.location}{" "}
+                {event.location}{' '}
             </p>
         );
 
     // Description
-    if (event.description !== "")
+    if (event.description !== '')
         popoverContent.push(
             <p key="dc" style={{ marginTop: 10 }}>
-                {event.description}{" "}
+                {event.description}{' '}
             </p>
         );
 
@@ -104,28 +116,46 @@ export function getEventCardInfo(event: Event) {
     // 標題與時間
     eventInfo.push(
         event.isAllDayEvent() ? (
-            <p key="title" style={{ color: "white", fontSize: 12 }}>
-                {event.title}{" "}
+            <p
+                key="title"
+                style={{ color: 'white', fontSize: 12, fontWeight: 'bolder' }}
+            >
+                {event.title}{' '}
             </p>
         ) : (
-            <p key="title" style={{ color: "white", fontSize: 12 }}>
-                {event.title} <strong style={{ marginLeft: 16, color: "rgba(255,255,255,0.4)", fontSize: 10 }}>{event.getDurationString()}</strong>
+            <p key="title" style={{ color: 'white', fontSize: 12, fontWeight: 'bolder' }}>
+                {event.title}{' '}
+                <strong
+                    style={{
+                        marginLeft: 16,
+                        color: 'rgba(255,255,255,0.4)',
+                        fontSize: 12
+                    }}
+                >
+                    {event.getDurationString()}
+                </strong>
             </p>
         )
     );
 
     // 補充敘述
-    if (event.description !== "")
+    if (event.description !== '')
         eventInfo.push(
-            <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }} key="description">
+            <p
+                style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 'bold' }}
+                key="description"
+            >
                 {event.description}
             </p>
         );
 
     // 地點
-    if (event.location !== "")
+    if (event.location !== '')
         eventInfo.push(
-            <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }} key="location">
+            <p
+                style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 'bold' }}
+                key="location"
+            >
                 {event.location}
             </p>
         );
@@ -133,14 +163,17 @@ export function getEventCardInfo(event: Event) {
     // 時間長度
     if (!event.isAllDayEvent())
         eventInfo.push(
-            <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }} key="duration">
+            <p
+                style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 'bold' }}
+                key="duration"
+            >
                 {event.getDuration()} 分鐘
             </p>
         );
 
     // 行事曆標題
     eventInfo.push(
-        <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }} key="cal">
+        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 'bold' }} key="cal">
             {event.calendarTitle}
         </p>
     );
@@ -153,30 +186,53 @@ export function getEventCardInfo(event: Event) {
  * @param {Date} date 想要拿來和今天比較的日期.
  */
 export function getDayDescription(date: Date) {
-    var dayDescription = "";
+    var dayDescription = '';
     var DayA = new Date(date);
     var DayB = new Date();
     DayA.setHours(12, 0, 0);
     DayB.setHours(12, 0, 0);
     if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) < 0) {
-        if (DayA.getFullYear() === DayB.getFullYear() && DayA.getMonth() === DayB.getMonth() && DayA.getDate() === DayB.getDate()) dayDescription = "今天";
-        else if (DayA.getFullYear() === DayB.getFullYear() && DayA.getMonth() === DayB.getMonth() && DayA.getDate() + 1 === DayB.getDate())
-            dayDescription = "昨天";
-        else if (DayA.getFullYear() === DayB.getFullYear() && DayA.getMonth() === DayB.getMonth() && DayA.getDate() + 2 === DayB.getDate())
-            dayDescription = "前天";
-        else dayDescription = Math.floor((DayA.getTime() - DayB.getTime()) / 3600000 / -24) + " 天前";
+        if (
+            DayA.getFullYear() === DayB.getFullYear() &&
+            DayA.getMonth() === DayB.getMonth() &&
+            DayA.getDate() === DayB.getDate()
+        )
+            dayDescription = '今天';
+        else if (
+            DayA.getFullYear() === DayB.getFullYear() &&
+            DayA.getMonth() === DayB.getMonth() &&
+            DayA.getDate() + 1 === DayB.getDate()
+        )
+            dayDescription = '昨天';
+        else if (
+            DayA.getFullYear() === DayB.getFullYear() &&
+            DayA.getMonth() === DayB.getMonth() &&
+            DayA.getDate() + 2 === DayB.getDate()
+        )
+            dayDescription = '前天';
+        else
+            dayDescription =
+                Math.floor((DayA.getTime() - DayB.getTime()) / 3600000 / -24) +
+                ' 天前';
     } else {
-        if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 0) dayDescription = "今天";
-        else if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 23) dayDescription = "明天";
-        else if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 47) dayDescription = "後天";
-        else dayDescription = Math.floor((DayA.getTime() - DayB.getTime()) / 3600000 / 24) + 1 + " 天後";
+        if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 0)
+            dayDescription = '今天';
+        else if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 23)
+            dayDescription = '明天';
+        else if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 47)
+            dayDescription = '後天';
+        else
+            dayDescription =
+                Math.floor((DayA.getTime() - DayB.getTime()) / 3600000 / 24) +
+                1 +
+                ' 天後';
     }
     return dayDescription;
 }
 
 /** 顯示錯誤訊息 */
 export function displayError(title: string, message: string) {
-    Notification["error"]({
+    Notification['error']({
         title: title,
         description: message
     });
@@ -207,8 +263,8 @@ export function createEvent(
     repeatID: string,
     ignore: boolean = false,
     isEmpty: boolean = false,
-    description: string = "",
-    location: string = "",
+    description: string = '',
+    location: string = '',
     calendarTitle: string
 ) {
     var newEvent = new Event();
@@ -234,31 +290,96 @@ export function buildRepeatToEvent(userdata: User, date: Date) {
             repeat = new Repeat(repeat);
             repeat.startDate.setHours(12, 0);
             repeat.endDate.setHours(12, 0);
-            if (date.getTime() - repeat.startDate.getTime() >= 0 && repeat.endDate.getTime() - date.getTime() >= 0) {
+            if (
+                date.getTime() - repeat.startDate.getTime() >= 0 &&
+                repeat.endDate.getTime() - date.getTime() >= 0
+            ) {
                 if (
-                    repeat.cycle === "Week" &&
+                    repeat.cycle === 'Week' &&
                     date.getDay() === repeat.repeatData &&
-                    !repeat.generated.includes(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate())
+                    !repeat.generated.includes(
+                        date.getFullYear() +
+                            '/' +
+                            (date.getMonth() + 1) +
+                            '/' +
+                            date.getDate()
+                    )
                 ) {
                     changed = true;
-                    repeat.generated.push(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate());
+                    repeat.generated.push(
+                        date.getFullYear() +
+                            '/' +
+                            (date.getMonth() + 1) +
+                            '/' +
+                            date.getDate()
+                    );
                     var startTime = new Date(date);
                     var endTime = new Date(date);
-                    startTime.setHours(repeat.startTime.getHours(), repeat.startTime.getMinutes());
-                    endTime.setHours(repeat.endTime.getHours(), repeat.endTime.getMinutes());
-                    calendar.events.push(createEvent(repeat.name, calendar.color, startTime, endTime, repeat.id, false, false, "", "", calendar.title));
+                    startTime.setHours(
+                        repeat.startTime.getHours(),
+                        repeat.startTime.getMinutes()
+                    );
+                    endTime.setHours(
+                        repeat.endTime.getHours(),
+                        repeat.endTime.getMinutes()
+                    );
+                    calendar.events.push(
+                        createEvent(
+                            repeat.name,
+                            calendar.color,
+                            startTime,
+                            endTime,
+                            repeat.id,
+                            false,
+                            false,
+                            '',
+                            '',
+                            calendar.title
+                        )
+                    );
                 } else if (
-                    repeat.cycle === "Month" &&
+                    repeat.cycle === 'Month' &&
                     date.getDate() === repeat.repeatData &&
-                    !repeat.generated.includes(date.getFullYear() + "/" + date.getMonth() + "/" + date.getDate())
+                    !repeat.generated.includes(
+                        date.getFullYear() +
+                            '/' +
+                            date.getMonth() +
+                            '/' +
+                            date.getDate()
+                    )
                 ) {
                     changed = true;
-                    repeat.generated.push(date.getFullYear() + "/" + date.getMonth() + "/" + date.getDate());
+                    repeat.generated.push(
+                        date.getFullYear() +
+                            '/' +
+                            date.getMonth() +
+                            '/' +
+                            date.getDate()
+                    );
                     startTime = new Date(date);
                     endTime = new Date(date);
-                    startTime.setHours(repeat.startTime.getHours(), repeat.startTime.getMinutes());
-                    endTime.setHours(repeat.endTime.getHours(), repeat.endTime.getMinutes());
-                    calendar.events.push(createEvent(repeat.name, calendar.color, startTime, endTime, repeat.id, false, false, "", "", calendar.title));
+                    startTime.setHours(
+                        repeat.startTime.getHours(),
+                        repeat.startTime.getMinutes()
+                    );
+                    endTime.setHours(
+                        repeat.endTime.getHours(),
+                        repeat.endTime.getMinutes()
+                    );
+                    calendar.events.push(
+                        createEvent(
+                            repeat.name,
+                            calendar.color,
+                            startTime,
+                            endTime,
+                            repeat.id,
+                            false,
+                            false,
+                            '',
+                            '',
+                            calendar.title
+                        )
+                    );
                 }
             }
 
@@ -290,7 +411,9 @@ export function eventsToDispay(calendars: Array<Calendar>, date: Date) {
 
         return null;
     });
-    eventsToDispay.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+    eventsToDispay.sort(
+        (a, b) => a.startTime.getTime() - b.startTime.getTime()
+    );
     return eventsToDispay;
 }
 

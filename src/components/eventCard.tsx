@@ -1,10 +1,11 @@
-import React, { CSSProperties } from "react";
-import { EventCardProps, EventCardState } from "../utils/interfaces";
-import { getEventPopoverContent, getLineAmount, getEventCardInfo } from "../utils/methods";
+import React, { CSSProperties } from 'react';
+import { EventCardProps, EventCardState } from '../utils/interfaces';
+import { getEventPopoverContent, getLineAmount, getEventCardInfo } from '../utils/methods';
 
-import { FlexboxGrid, Whisper, Popover, Panel } from "rsuite";
+import { FlexboxGrid, Whisper, Popover, Panel } from 'rsuite';
 
 class EventCard extends React.Component<EventCardProps, EventCardState> {
+    trigger: any;
     constructor(props: Readonly<EventCardProps>) {
         super(props);
         this.state = {
@@ -13,9 +14,16 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
         this.handleClick = this.handleClick.bind(this);
         this.handleMouseEnter = this.handleMouseEnter.bind(this);
         this.handleMouseLeave = this.handleMouseLeave.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
     }
 
-    handleClick() {
+    handleClick(e: { stopPropagation: () => void; }) {
+        e.stopPropagation();
+            this.trigger.show();
+    }
+
+    handleDoubleClick(e: { stopPropagation: () => void; }) {
+        e.stopPropagation();
         this.props.openEventEditDialog(this.props.event);
     }
 
@@ -31,18 +39,18 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
         const event = this.props.event;
         const style: CSSProperties = {
             height: this.props.height > 0 ? this.props.height : event.getDuration(),
-            backgroundImage: "linear-gradient(315deg, " + event.color[0] + " 0%, " + event.color[1] + " 100%)",
+            backgroundImage: 'linear-gradient(315deg, ' + event.color[0] + ' 0%, ' + event.color[1] + ' 100%)',
             fontSize: 8,
             paddingLeft: 16,
             paddingTop: 10,
             marginTop: event.isAllDayEvent() ? 16 : 0,
             paddingBottom: 6,
             opacity: event.ignore ? 0.2 : 1,
-            width: "100%"
+            width: '100%'
         };
 
         const gridStyle: CSSProperties = {
-            position: "absolute",
+            position: 'absolute',
             top: event.getDurationBetweenDayBegin(),
             zIndex: this.state.hover ? 1500 : 1420 - event.getDuration(),
             width: this.props.position === undefined ? 432 : 216,
@@ -56,14 +64,17 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
         if (event.isAllDayEvent())
             return (
                 <Whisper
+                    triggerRef={ref => {
+                        this.trigger = ref;
+                    }}
                     placement="right"
                     delayHide={0}
-                    trigger="hover"
+                    trigger="active"
                     speaker={
                         <Popover
                             full
                             style={{
-                                backgroundImage: "linear-gradient(315deg, " + event.color[0] + " 0%, " + event.color[1] + " 100%)",
+                                backgroundImage: 'linear-gradient(315deg, ' + event.color[0] + ' 0%, ' + event.color[1] + ' 100%)',
                                 padding: 24,
                                 borderTopRightRadius: 20,
                                 borderBottomLeftRadius: 20,
@@ -79,7 +90,7 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
                         </Popover>
                     }
                 >
-                    <Panel style={style} onClick={this.handleClick} key={event.id} className="EventCard" bodyFill>
+                    <Panel style={style} onClick={this.handleClick} key={event.id} className="EventCard" onDoubleClick={this.handleDoubleClick} bodyFill>
                         {eventInfo.slice(0, lineAmount).map(info => {
                             return info;
                         })}
@@ -88,17 +99,20 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
             );
         else
             return (
-                <FlexboxGrid className={event.ignore ? "ignoredEventCardGrid" : "EventCardGrid"} style={gridStyle}>
+                <FlexboxGrid className={event.ignore ? 'ignoredEventCardGrid' : 'EventCardGrid'} style={gridStyle}>
                     <Whisper
+                        triggerRef={ref => {
+                            this.trigger = ref;
+                        }}
                         placement="right"
                         delayHide={0}
                         container={this.props.container.current === null ? undefined : this.props.container.current}
-                        trigger="hover"
+                        trigger="active"
                         speaker={
                             <Popover
                                 full
                                 style={{
-                                    backgroundImage: "linear-gradient(315deg, " + event.color[0] + " 0%, " + event.color[1] + " 100%)",
+                                    backgroundImage: 'linear-gradient(315deg, ' + event.color[0] + ' 0%, ' + event.color[1] + ' 100%)',
                                     padding: 24,
                                     borderTopRightRadius: 20,
                                     borderBottomLeftRadius: 20,
@@ -120,6 +134,7 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
                             bodyFill
                             onMouseEnter={this.handleMouseEnter}
                             onMouseLeave={this.handleMouseLeave}
+                            onDoubleClick={this.handleDoubleClick}
                         >
                             {eventInfo.slice(0, lineAmount).map(info => {
                                 return info;

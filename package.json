@@ -41,9 +41,10 @@
   },
   "devDependencies": {
     "@types/react-transition-group": "^4.2.4",
+    "electron": "^8.1.0",
     "electron-builder": "^22.4.0",
-    "typescript": "^3.8.3",
-    "electron": "^8.1.0"
+    "electron-packager": "^14.2.1",
+    "typescript": "^3.8.3"
   },
   "build": {
     "appId": "com.yuanlin.reco",

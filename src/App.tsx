@@ -418,7 +418,7 @@ class index extends React.Component<IndexProps, IndexStates> {
         var dayDescription = getDayDescription(this.state.selectedDay);
 
         return (
-            <Container style={{ backgroundImage: 'url("bg.png")' }}>
+            <Container style={{backgroundColor: '#2a2c31'}}>
                 <Helmet>
                     <title>Reco</title>
                 </Helmet>
