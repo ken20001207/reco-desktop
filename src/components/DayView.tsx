@@ -40,6 +40,7 @@ class DayView extends React.Component<DayViewProps> {
                     height={-1}
                     position={position.get(event)}
                     event={event}
+                    showEventInfoDrawer={this.props.showEventInfoDrawer}
                     openEventEditDialog={this.props.openEventEditDialog}
                     openEventCreateDialog={this.props.openEventCreateDialog}
                     container={this.props.container}

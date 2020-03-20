@@ -12,9 +12,17 @@ import CreateRepeatDialog from "./components/CreateRepeatDialog";
 import { User, Event, Repeat, Calendar } from "./utils/classes";
 import { IndexStates, IndexProps, Inputing } from "./utils/interfaces";
 import { duration, defaultStyle, transitionStyles } from "./utils/config";
-import { getDayDescription, eventsToDispay, allDayEventsToDispay, buildRepeatToEvent, createEvent, updateUserData, getUserData } from "./utils/methods";
+import {
+    getDayDescription,
+    eventsToDispay,
+    allDayEventsToDispay,
+    buildRepeatToEvent,
+    createEvent,
+    updateUserData,
+    getUserData
+} from "./utils/methods";
 
-import { Loader, Panel, Container, FlexboxGrid, Divider, Sidenav, Nav, Icon } from "rsuite";
+import { Loader, Panel, FlexboxGrid, Divider } from "rsuite";
 
 import "rsuite/dist/styles/rsuite-dark.css";
 import "./App.css";
@@ -49,8 +57,12 @@ class index extends React.Component<IndexProps, IndexStates> {
                 description: "",
                 location: "",
                 repeatData: 0
-            }
+            },
+            screenWidth: 0,
+            screenHeight: 0,
+            displayEventInfoDrawer: false
         };
+
         this.handleDayClick = this.handleDayClick.bind(this);
         this.openEventEditDialog = this.openEventEditDialog.bind(this);
         this.closeEventEditDialog = this.closeEventEditDialog.bind(this);
@@ -64,15 +76,21 @@ class index extends React.Component<IndexProps, IndexStates> {
         this.removeEvent = this.removeEvent.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.keyboardHandler = this.keyboardHandler.bind(this);
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.showEventInfoDrawer = this.showEventInfoDrawer.bind(this);
+        this.closeEventInfoDrawer = this.closeEventInfoDrawer.bind(this);
+
         this.dayviewContainer = React.createRef<HTMLDivElement>();
     }
 
     async handleDayClick(day: Date) {
-        var newdata = buildRepeatToEvent(this.state.userdata, day);
-        if (newdata.changed) updateUserData(newdata.data);
-        this.setState({
-            selectedDay: day,
-            userdata: newdata.data
+        buildRepeatToEvent(this.state.userdata, day).then(newdata => {
+            if (newdata.changed) updateUserData(newdata.data);
+            this.setState({
+                selectedDay: day,
+                loaded: true,
+                userdata: newdata.data
+            });
         });
     }
 
@@ -88,12 +106,23 @@ class index extends React.Component<IndexProps, IndexStates> {
     }
 
     async componentDidMount() {
+        // screen Size Listener
+        this.updateWindowDimensions();
+        window.addEventListener("resize", this.updateWindowDimensions);
+
+        // get User Data
         getUserData("ken20001207").then(data => {
             const userdata = new User(data as User);
             this.setState({ userdata: userdata, loaded: true });
             return null;
         });
+
+        // Keyboard Listener
         document.addEventListener("keydown", this.keyboardHandler, false);
+    }
+
+    updateWindowDimensions() {
+        this.setState({ screenWidth: window.innerWidth, screenHeight: window.innerHeight });
     }
 
     openEventEditDialog(event: Event) {
@@ -103,7 +132,14 @@ class index extends React.Component<IndexProps, IndexStates> {
             inputing: {
                 title: event.title,
                 date: event.startTime.getFullYear() + "/" + (event.startTime.getMonth() + 1) + "/" + event.startTime.getDate(),
-                time: event.startTime.getHours() + ":" + event.startTime.getMinutes() + "~" + event.endTime.getHours() + ":" + event.endTime.getMinutes(),
+                time:
+                    event.startTime.getHours() +
+                    ":" +
+                    event.startTime.getMinutes() +
+                    "~" +
+                    event.endTime.getHours() +
+                    ":" +
+                    event.endTime.getMinutes(),
                 ignore: event.ignore,
                 ignoreReason: event.ignoreReason === undefined ? "" : event.ignoreReason,
                 allday: event.isAllDayEvent(),
@@ -127,8 +163,20 @@ class index extends React.Component<IndexProps, IndexStates> {
             creatingEvent: true,
             inputing: {
                 title: "",
-                date: this.state.selectedDay.getFullYear() + "/" + (this.state.selectedDay.getMonth() + 1) + "/" + this.state.selectedDay.getDate(),
-                time: new Date().getHours() + ":" + new Date().getMinutes() + "~" + (new Date().getHours() + 1) + ":" + new Date().getMinutes(),
+                date:
+                    this.state.selectedDay.getFullYear() +
+                    "/" +
+                    (this.state.selectedDay.getMonth() + 1) +
+                    "/" +
+                    this.state.selectedDay.getDate(),
+                time:
+                    new Date().getHours() +
+                    ":" +
+                    new Date().getMinutes() +
+                    "~" +
+                    (new Date().getHours() + 1) +
+                    ":" +
+                    new Date().getMinutes(),
                 calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
                 allday: false,
                 ignore: false,
@@ -150,11 +198,28 @@ class index extends React.Component<IndexProps, IndexStates> {
             creatingRepeat: true,
             inputing: {
                 title: "",
-                startDate: this.state.selectedDay.getFullYear() + "/" + (this.state.selectedDay.getMonth() + 1) + "/" + this.state.selectedDay.getDate(),
-                endDate: this.state.selectedDay.getFullYear() + "/" + (this.state.selectedDay.getMonth() + 1) + "/" + this.state.selectedDay.getDate(),
+                startDate:
+                    this.state.selectedDay.getFullYear() +
+                    "/" +
+                    (this.state.selectedDay.getMonth() + 1) +
+                    "/" +
+                    this.state.selectedDay.getDate(),
+                endDate:
+                    this.state.selectedDay.getFullYear() +
+                    "/" +
+                    (this.state.selectedDay.getMonth() + 1) +
+                    "/" +
+                    this.state.selectedDay.getDate(),
                 cycle: "Week",
                 repeatData: 0,
-                time: new Date().getHours() + ":" + new Date().getMinutes() + "~" + (new Date().getHours() + 1) + ":" + new Date().getMinutes(),
+                time:
+                    new Date().getHours() +
+                    ":" +
+                    new Date().getMinutes() +
+                    "~" +
+                    (new Date().getHours() + 1) +
+                    ":" +
+                    new Date().getMinutes(),
                 calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
                 allday: false,
                 date: "",
@@ -180,14 +245,28 @@ class index extends React.Component<IndexProps, IndexStates> {
         });
         var newStartTime = new Date();
         var newEndTime = new Date();
-        newStartTime.setFullYear(+this.state.inputing.date.split("/")[0], +this.state.inputing.date.split("/")[1] - 1, +this.state.inputing.date.split("/")[2]);
-        newEndTime.setFullYear(+this.state.inputing.date.split("/")[0], +this.state.inputing.date.split("/")[1] - 1, +this.state.inputing.date.split("/")[2]);
+        newStartTime.setFullYear(
+            +this.state.inputing.date.split("/")[0],
+            +this.state.inputing.date.split("/")[1] - 1,
+            +this.state.inputing.date.split("/")[2]
+        );
+        newEndTime.setFullYear(
+            +this.state.inputing.date.split("/")[0],
+            +this.state.inputing.date.split("/")[1] - 1,
+            +this.state.inputing.date.split("/")[2]
+        );
         if (this.state.inputing.allday) {
             newStartTime.setHours(0, 0);
             newEndTime.setHours(24, 0);
         } else {
-            newStartTime.setHours(+this.state.inputing.time.split("~")[0].split(":")[0], +this.state.inputing.time.split("~")[0].split(":")[1]);
-            newEndTime.setHours(+this.state.inputing.time.split("~")[1].split(":")[0], +this.state.inputing.time.split("~")[1].split(":")[1]);
+            newStartTime.setHours(
+                +this.state.inputing.time.split("~")[0].split(":")[0],
+                +this.state.inputing.time.split("~")[0].split(":")[1]
+            );
+            newEndTime.setHours(
+                +this.state.inputing.time.split("~")[1].split(":")[0],
+                +this.state.inputing.time.split("~")[1].split(":")[1]
+            );
         }
         var newdata = this.state.userdata;
         newdata.calendars.map(calendar => {
@@ -250,8 +329,14 @@ class index extends React.Component<IndexProps, IndexStates> {
             newStartTime.setHours(0, 0);
             newEndTime.setHours(23, 59);
         } else {
-            newStartTime.setHours(+this.state.inputing.time.split("~")[0].split(":")[0], +this.state.inputing.time.split("~")[0].split(":")[1]);
-            newEndTime.setHours(+this.state.inputing.time.split("~")[1].split(":")[0], +this.state.inputing.time.split("~")[1].split(":")[1]);
+            newStartTime.setHours(
+                +this.state.inputing.time.split("~")[0].split(":")[0],
+                +this.state.inputing.time.split("~")[0].split(":")[1]
+            );
+            newEndTime.setHours(
+                +this.state.inputing.time.split("~")[1].split(":")[0],
+                +this.state.inputing.time.split("~")[1].split(":")[1]
+            );
         }
         var newdata = this.state.userdata;
         newdata.calendars.map(calendar => {
@@ -270,7 +355,7 @@ class index extends React.Component<IndexProps, IndexStates> {
             }
             return null;
         });
-        newdata = buildRepeatToEvent(newdata, this.state.selectedDay).data;
+        newdata = (await buildRepeatToEvent(newdata, this.state.selectedDay)).data;
 
         // 更新視圖
         var etd = eventsToDispay(newdata.calendars, new Date());
@@ -286,14 +371,28 @@ class index extends React.Component<IndexProps, IndexStates> {
         });
         var newStartTime = new Date();
         var newEndTime = new Date();
-        newStartTime.setFullYear(+this.state.inputing.date.split("/")[0], +this.state.inputing.date.split("/")[1] - 1, +this.state.inputing.date.split("/")[2]);
-        newEndTime.setFullYear(+this.state.inputing.date.split("/")[0], +this.state.inputing.date.split("/")[1] - 1, +this.state.inputing.date.split("/")[2]);
+        newStartTime.setFullYear(
+            +this.state.inputing.date.split("/")[0],
+            +this.state.inputing.date.split("/")[1] - 1,
+            +this.state.inputing.date.split("/")[2]
+        );
+        newEndTime.setFullYear(
+            +this.state.inputing.date.split("/")[0],
+            +this.state.inputing.date.split("/")[1] - 1,
+            +this.state.inputing.date.split("/")[2]
+        );
         if (this.state.inputing.allday) {
             newStartTime.setHours(0, 0);
             newEndTime.setHours(24, 0);
         } else {
-            newStartTime.setHours(+this.state.inputing.time.split("~")[0].split(":")[0], +this.state.inputing.time.split("~")[0].split(":")[1]);
-            newEndTime.setHours(+this.state.inputing.time.split("~")[1].split(":")[0], +this.state.inputing.time.split("~")[1].split(":")[1]);
+            newStartTime.setHours(
+                +this.state.inputing.time.split("~")[0].split(":")[0],
+                +this.state.inputing.time.split("~")[0].split(":")[1]
+            );
+            newEndTime.setHours(
+                +this.state.inputing.time.split("~")[1].split(":")[0],
+                +this.state.inputing.time.split("~")[1].split(":")[1]
+            );
         }
         var newdata = this.state.userdata;
         newdata.calendars.map(calendar => {
@@ -365,6 +464,19 @@ class index extends React.Component<IndexProps, IndexStates> {
         });
     }
 
+    showEventInfoDrawer(event: Event) {
+        this.setState({
+            selectedEvent: event,
+            displayEventInfoDrawer: true
+        });
+    }
+
+    closeEventInfoDrawer() {
+        this.setState({
+            displayEventInfoDrawer: false
+        });
+    }
+
     render() {
         var DayviewContent = <Loader />;
         var AllDayEventsContent = <Loader />;
@@ -377,6 +489,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                     events={etd}
                     openEventEditDialog={this.openEventEditDialog}
                     openEventCreateDialog={this.openEventCreateDialog}
+                    showEventInfoDrawer={this.showEventInfoDrawer}
                 />
             );
             AllDayEventsContent = (
@@ -385,15 +498,16 @@ class index extends React.Component<IndexProps, IndexStates> {
                     events={ade}
                     openEventEditDialog={this.openEventEditDialog}
                     openEventCreateDialog={this.openEventCreateDialog}
+                    showEventInfoDrawer={this.showEventInfoDrawer}
                 />
             );
         }
         var Hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
         var HourLines = Hours.map(hour => {
             return (
-                <div key={hour} style={{ position: "absolute", top: hour * 60, width: 496, margin: 0 }}>
-                    <p style={{ lineHeight: 0, color: "rgba(255,255,255,0.1)" }}>{hour + ":00"}</p>
-                    <Divider style={{ marginLeft: 64, marginTop: 0, marginBottom: 0 }} />
+                <div key={hour} style={{ position: "absolute", top: hour * 60, width: "100%", margin: 0 }}>
+                    <p style={{ lineHeight: 0, color: "rgba(255,255,255,0.2)" }}>{hour + ":00"}</p>
+                    <Divider style={{ marginLeft: 64, marginTop: 0, marginBottom: 0, height: 2, backgroundColor: "rgb(40,40,40)" }} />
                 </div>
             );
         });
@@ -405,7 +519,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                         position: "absolute",
                         top: new Date().getHours() * 60 + new Date().getMinutes(),
                         backgroundColor: "red",
-                        width: 432,
+                        width: "100%",
                         marginLeft: 64,
                         marginTop: 0,
                         zIndex: 2000
@@ -413,101 +527,132 @@ class index extends React.Component<IndexProps, IndexStates> {
                 />
             ) : null;
 
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ];
 
         var dayDescription = getDayDescription(this.state.selectedDay);
 
         return (
-            <Container style={{backgroundColor: '#2a2c31'}}>
-                <Helmet>
-                    <title>Reco</title>
-                </Helmet>
+            <div style={{ backgroundColor: "rgba(26,26,26,0)" }}>
+                <Helmet>Reco</Helmet>
 
-                <FlexboxGrid justify="center">
-                    <FlexboxGrid.Item colspan={5}>
-                        <Sidenav defaultOpenKeys={["3", "4"]} style={{ width: 240, backgroundColor: "rgba(0,0,0,0.2)", height: "100vh", paddingTop: 300 }}>
-                            <Sidenav.Header>
-                                <div className="appLogo">
-                                    <img style={{ width: "80%" }} src="logofontf.png" alt="" />
-                                    <p>為你量身打造的日程規劃工具</p>
-                                </div>
-                            </Sidenav.Header>
-                            <Sidenav.Body>
-                                <Nav>
-                                    <Nav.Item eventKey="1">
-                                        日程檢視
-                                    </Nav.Item>
-                                </Nav>
-                            </Sidenav.Body>
-                        </Sidenav>
-                    </FlexboxGrid.Item>
-                    <FlexboxGrid.Item colspan={6}>
-                        <div className="day-info">
-                            <p>{dayDescription}</p>
-                            <h1>{this.state.selectedDay.getDate()}</h1>
-                            <h3>
-                                {monthNames[this.state.selectedDay.getMonth()]} {this.state.selectedDay.getFullYear()}{" "}
-                            </h3>
+                <div className="DragBar" style={{ width: "100%", position: "fixed", top: 0, left: 0, height: 30 }}></div>
+
+                <div style={{ display: "inline-block", width: 280, verticalAlign: "top" }}>
+                    <div
+                        style={{
+                            width: "100%",
+                            backgroundColor: "rgba(42,42,43,0.8)",
+                            height: "100vh",
+                            borderRightColor: "black",
+                            borderRightWidth: "10px",
+                            paddingTop: 36
+                        }}
+                    >
+                        <div className="appLogo">
+                            <img style={{ width: 80, display: "inline-block" }} src="logofontf.png" alt="" />
+                            <p style={{ fontSize: 12, display: "inline-block", marginLeft: 12, verticalAlign: "bottom", paddingBottom: 4 }}>
+                                內部開發版本
+                            </p>
                         </div>
-                        <div className="day-view-panel">
-                            <div className="day-view-scroll">
-                                <Transition in={this.state.loaded} timeout={duration}>
-                                    {state => (
-                                        <div
-                                            style={{
-                                                ...defaultStyle,
-                                                ...transitionStyles[state]
-                                            }}
-                                        >
-                                            {AllDayEventsContent}
-                                        </div>
-                                    )}
-                                </Transition>
-                            </div>
-                        </div>
-                        <div className="day-picker-panel">
+                        <div className="day-picker-panel" style={{ position: "fixed", bottom: 18 }}>
                             <DayPicker selectedDays={this.state.selectedDay} onDayClick={this.handleDayClick} />
                         </div>
-                    </FlexboxGrid.Item>
-                    <FlexboxGrid.Item colspan={13}>
-                        <Panel bodyFill onDoubleClick={this.openEventCreateDialog}>
+                    </div>
+                </div>
+                <div
+                    style={{
+                        display: "inline-block",
+                        width: 320,
+                        backgroundColor: "rgb(30,30,30)",
+                        verticalAlign: "top",
+                        height: this.state.screenHeight,
+                        paddingLeft: 36,
+                        paddingRight: 36,
+                        paddingTop: 60
+                    }}
+                >
+                    <div className="day-info">
+                        <p>{dayDescription}</p>
+                        <h1>{this.state.selectedDay.getDate()}</h1>
+                        <h3>
+                            {monthNames[this.state.selectedDay.getMonth()]} {this.state.selectedDay.getFullYear()}{" "}
+                        </h3>
+                    </div>
+                    <div className="day-view-panel">
+                        <div className="day-view-scroll">
+                            <Transition in={this.state.loaded} timeout={duration}>
+                                {state => (
+                                    <div
+                                        style={{
+                                            ...defaultStyle,
+                                            ...transitionStyles[state]
+                                        }}
+                                    >
+                                        {AllDayEventsContent}
+                                    </div>
+                                )}
+                            </Transition>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    style={{
+                        display: "inline-block",
+                        width: this.state.screenWidth - 600,
+                        verticalAlign: "top",
+                        backgroundColor: "rgba(26,26,26,1)"
+                    }}
+                >
+                    <Panel bodyFill onDoubleClick={this.openEventCreateDialog} style={{ width: "100%" }}>
+                        <div
+                            style={{
+                                overflowY: "scroll",
+                                height: "100vh"
+                            }}
+                        >
                             <div
                                 style={{
-                                    overflowY: "scroll",
-                                    height: "100vh"
+                                    height: 1620,
+                                    paddingTop: 100,
+                                    position: "relative"
                                 }}
+                                ref={this.dayviewContainer}
                             >
-                                <div
-                                    style={{
-                                        height: 1620,
-                                        paddingTop: 100,
-                                        position: "relative"
-                                    }}
-                                    ref={this.dayviewContainer}
-                                >
-                                    <FlexboxGrid justify="start">
-                                        <FlexboxGrid.Item colspan={12}>
-                                            {HourLines}
-                                            {NowLine}
-                                            <Transition in={this.state.loaded} timeout={duration}>
-                                                {state => (
-                                                    <div
-                                                        style={{
-                                                            ...defaultStyle,
-                                                            ...transitionStyles[state]
-                                                        }}
-                                                    >
-                                                        {DayviewContent}
-                                                    </div>
-                                                )}
-                                            </Transition>
-                                        </FlexboxGrid.Item>
-                                    </FlexboxGrid>
-                                </div>
+                                <FlexboxGrid justify="center" style={{ marginLeft: 60 }}>
+                                    <FlexboxGrid.Item colspan={16} style={{ maxWidth: 560 }}>
+                                        {HourLines}
+                                        {NowLine}
+                                        <Transition in={this.state.loaded} timeout={duration}>
+                                            {state => (
+                                                <div
+                                                    style={{
+                                                        ...defaultStyle,
+                                                        ...transitionStyles[state]
+                                                    }}
+                                                >
+                                                    {DayviewContent}
+                                                </div>
+                                            )}
+                                        </Transition>
+                                    </FlexboxGrid.Item>
+                                </FlexboxGrid>
                             </div>
-                        </Panel>
-                    </FlexboxGrid.Item>
-                </FlexboxGrid>
+                        </div>
+                    </Panel>
+                </div>
 
                 <EditEventDialog
                     editingEvent={this.state.editingEvent}
@@ -541,7 +686,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                     createRepeat={this.createRepeat}
                     waiting={this.state.waiting}
                 />
-            </Container>
+            </div>
         );
     }
 }

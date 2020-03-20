@@ -104,7 +104,7 @@ class EventCard extends React.Component<EventCardProps, EventCardState> {
                         triggerRef={ref => {
                             this.trigger = ref;
                         }}
-                        placement="right"
+                        placement="autoHorizontalStart"
                         delayHide={0}
                         container={this.props.container.current === null ? undefined : this.props.container.current}
                         trigger="active"

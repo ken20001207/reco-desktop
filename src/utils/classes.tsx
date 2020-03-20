@@ -1,3 +1,6 @@
+import React from "react";
+import { Divider } from "rsuite";
+
 const defaultEvent: Event = {
     startTime: new Date(),
     endTime: new Date(),
@@ -40,6 +43,59 @@ const defaultEvent: Event = {
     },
     getDurationString() {
         return this.getStartTimeSrting() + " - " + this.getEndTimeSting();
+    },
+
+    /** 建構事件彈窗資訊
+     * Compose EvnetCrad Popover Content */
+    getPopoverContent() {
+        var popoverContent = [];
+
+        // Calendar Title
+        popoverContent.push(<p>{this.calendarTitle}</p>);
+
+        // Evnet Title
+        popoverContent.push(
+            <h1
+                key="et"
+                style={{
+                    color: "white",
+                    fontSize: 18,
+                    fontWeight: 3000,
+                    lineHeight: 1.5
+                }}
+            >
+                {this.title}
+            </h1>
+        );
+
+        // Ignore Reason
+        if (this.ignore)
+            popoverContent.push(
+                <p style={{ color: "rgba(255,255,255,0.5)" }} key="ir">
+                    該事件已被忽略，因為{this.ignoreReason}{" "}
+                </p>
+            );
+
+        // Duration
+        if (!this.isAllDayEvent()) popoverContent.push(<p>{this.getDurationString()}</p>);
+
+        // Location
+        if (this.location !== "")
+            popoverContent.push(
+                <p key="lc" style={{ marginTop: 10 }}>
+                    {this.location}{" "}
+                </p>
+            );
+
+        // Description
+        if (this.description !== "")
+            popoverContent.push(
+                <p key="dc" style={{ marginTop: 10 }}>
+                    {this.description}{" "}
+                </p>
+            );
+
+        return popoverContent;
     }
 };
 
@@ -107,7 +163,56 @@ export class Event {
     }
 
     getDurationString() {
-        return this.getStartTimeSrting() + " - " + this.getEndTimeSting();
+        return this.getStartTimeSrting() + " ~ " + this.getEndTimeSting();
+    }
+
+    /** 建構事件彈窗資訊
+     * Compose EvnetCrad Popover Content */
+    getPopoverContent() {
+        var popoverContent = [];
+
+        // Ignore Reason
+        if (this.ignore)
+            popoverContent.push(
+                this.ignoreReason !== "" ? (
+                    <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 16 }} key="ir">
+                        該事件已被忽略，因為{this.ignoreReason}
+                    </p>
+                ) : (
+                    <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 16 }} key="ir">
+                        該事件已被忽略
+                    </p>
+                )
+            );
+
+        popoverContent.push( !this.isAllDayEvent() ?
+            <div style={{marginTop: 18}}>
+                <p style={{display: "inline-block"}}>時間</p>
+                <h5 style={{marginLeft: 8, display: "inline-block"}}>{this.getDurationString()}</h5>
+            </div> : <div style={{marginTop: 18}}>
+                <p style={{display: "inline-block"}}>全天事件</p>
+            </div>
+        );
+
+        // Location
+        if (this.location !== "")
+            popoverContent.push(
+                <div style={{marginTop: 18}}>
+                <p style={{display: "inline-block"}}>地點</p>
+                <h5 style={{marginLeft: 8, display: "inline-block"}}>{this.location}</h5>
+            </div>
+            );
+
+        // Description
+        if (this.description !== "")
+            popoverContent.push(
+                <div style={{marginTop: 18}}>
+                    <Divider />
+                <h5 style={{ display: "inline-block"}}>{this.description}</h5>
+            </div>
+            );
+
+        return popoverContent;
     }
 }
 

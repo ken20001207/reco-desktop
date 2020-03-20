@@ -1,6 +1,8 @@
 import { User, Event, Calendar } from "./classes";
 /** index 組件 State */
 export interface IndexStates {
+    screenWidth: number,
+    screenHeight: number,
     loaded: boolean,
     waiting: boolean,
     removing: boolean,
@@ -12,7 +14,8 @@ export interface IndexStates {
     creatingEvent: boolean,
     creatingRepeat: boolean,
     selectedEvent: Event,
-    inputing: Inputing
+    inputing: Inputing,
+    displayEventInfoDrawer: boolean
 }
 
 /** index 組件 Props */
@@ -29,7 +32,8 @@ export interface EventCardProps {
     event: Event,
     openEventEditDialog(event: Event): void,
     openEventCreateDialog(): void,
-    container: React.RefObject<HTMLDivElement>;
+    container: React.RefObject<HTMLDivElement>,
+    showEventInfoDrawer(event: Event): void
 }
 
 /** EvnetCard 組件 States */
@@ -55,6 +59,7 @@ export interface DayViewProps {
     events: Array<Event>,
     openEventCreateDialog(): void,
     openEventEditDialog(event: Event): void,
+    showEventInfoDrawer(event: Event): void,
     container: React.RefObject<HTMLDivElement>;
 }
 
@@ -86,6 +91,7 @@ export interface AllDayEventsProps {
     events: Array<Event>;
     openEventEditDialog(event: Event): void,
     openEventCreateDialog(): void,
+    showEventInfoDrawer(event: Event): void,
     container: React.RefObject<HTMLDivElement>;
 }
 

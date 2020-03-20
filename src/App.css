@@ -1,9 +1,13 @@
+.DragBar {
+    -webkit-app-region: drag;
+}
+
 .ignoredEventCardGrid {
     z-index: 1;
 }
 
 .rs-modal-wrapper {
-    z-index: 2050;
+    z-index: 5000;
 }
 
 .appLogo {
@@ -18,7 +22,7 @@
 }
 
 .rs-picker-menu.rs-picker-select-menu {
-    z-index: 2055;
+    z-index: 5055;
 }
 
 .appLogo > p {
@@ -28,7 +32,7 @@
 }
 
 .EventCard:hover {
-    box-shadow: 0px 0px 8px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 1);
 }
 
 .EventCard {
@@ -37,15 +41,15 @@
 }
 
 .day-view-panel {
-    margin-left: 28px;
-    width: 250px;
+    width: 260px;
 }
 
 .day-view-scroll {
     overflow-y: scroll;
-    height: 25vh;
+    height: 45vh;
     position: relative;
     margin-top: 32px;
+    padding: 8px;
 }
 
 .day-picker-panel {
@@ -53,26 +57,29 @@
 }
 
 .day-info {
-    margin-left: 28px;
     margin-top: 48px;
+    padding-left: 8px;
 }
 
 .day-info > h1 {
     color: white;
     font-size: 100px;
-    margin-bottom: 24px;
+    font-weight: bolder;
+    margin-bottom: 18px;
 }
 
 .day-info > h3 {
     color: gray;
     font-size: 24px;
+    font-weight: bolder;
     margin-bottom: 8x;
 }
 
 .day-info > p {
     color: gray;
     font-size: 18px;
-    margin-bottom: 36px;
+    font-weight: bolder;
+    margin-bottom: 24px;
 }
 
 .fade-enter,
@@ -116,6 +123,7 @@ textarea,
 
 body {
     margin: 0;
+    background-color: #2a2c31;
 }
 ::-webkit-scrollbar {
     width: 0px;
