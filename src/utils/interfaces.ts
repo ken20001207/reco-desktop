@@ -1,4 +1,4 @@
-import { User, Event, Calendar } from "./classes";
+import { User, Event, Calendar, Todo } from "./classes";
 /** index 組件 State */
 export interface IndexStates {
     screenWidth: number,
@@ -11,9 +11,12 @@ export interface IndexStates {
     userdata: User,
     filled: Array<Event>,
     editingEvent: boolean,
+    editingTodo: boolean,
     creatingEvent: boolean,
     creatingRepeat: boolean,
+    creatingTodo: boolean,
     selectedEvent: Event,
+    selectedTodo: Todo,
     inputing: Inputing,
     displayEventInfoDrawer: boolean,
     now: Date
@@ -33,12 +36,26 @@ export interface EventCardProps {
     event: Event,
     openEventEditDialog(event: Event): void,
     openEventCreateDialog(): void,
-    container: React.RefObject<HTMLDivElement>,
-    showEventInfoDrawer(event: Event): void
+    container: React.RefObject<HTMLDivElement>
 }
 
 /** EvnetCard 組件 States */
 export interface EventCardState {
+    hover: boolean
+}
+
+/** TodoCard 組件 Props */
+export interface TodoCardProps {
+    position: number | undefined,
+    height: number,
+    todo: Todo,
+    openTodoEditDialog(todo: Todo): void,
+    openTodoCreateDialog(): void,
+    container: React.RefObject<HTMLDivElement>
+}
+
+/** TodoCard 組件 States */
+export interface TodoCardState {
     hover: boolean
 }
 
@@ -55,12 +72,24 @@ export interface EditEventDialogProps {
     updateEvent(): void,
 }
 
+/** EditTodoDialog 組件 Props */
+export interface EditTodoDialogProps {
+    inputing: Inputing,
+    editingTodo: boolean,
+    removing: boolean,
+    waiting: boolean,
+    selectedTodo: Todo,
+    closeTodoEditDialog(): void,
+    handleFormChange(formValue: {}): void,
+    removeTodo(): void,
+    updateTodo(): void,
+}
+
 /** DayView 組件 Props */
 export interface DayViewProps {
     events: Array<Event>,
     openEventCreateDialog(): void,
     openEventEditDialog(event: Event): void,
-    showEventInfoDrawer(event: Event): void,
     container: React.RefObject<HTMLDivElement>;
 }
 
@@ -87,28 +116,47 @@ export interface CreateEventDialogProps {
     openRepeatCreateDialog(): void,
 }
 
+/** CreateEventDialog 組件 Props*/
+export interface CreateTodoDialogProps {
+    userdata: User,
+    inputing: Inputing,
+    creatingTodo: boolean,
+    waiting: boolean,
+    createTodo(): void, 
+    closeTodoCreateDialog(): void,
+    handleFormChange(formValue: {}): void
+}
+
 /** AllDayEvents 組件 Props*/
 export interface AllDayEventsProps {
     events: Array<Event>;
     openEventEditDialog(event: Event): void,
     openEventCreateDialog(): void,
-    showEventInfoDrawer(event: Event): void,
+    container: React.RefObject<HTMLDivElement>;
+}
+
+/** todoDisplay 組件 Props*/
+export interface todoDisplayProps {
+    todos: Array<Todo>;
+    openTodoEditDialog(todo: Todo): void,
+    openTodoCreateDialog(): void,
     container: React.RefObject<HTMLDivElement>;
 }
 
 /** 輸入內容暫存區 */
 export interface Inputing {
     title: string,
-    date: string,
-    time: string,
+    date: Date,
     ignore: boolean,
+    deadLine: Date,
     ignoreReason: string,
     allday: boolean,
     calendar: { label: string, value: Calendar },
-    startDate: string,
-    endDate: string,
+    startTime: Date,
+    endTime: Date,
     cycle: string,
     repeatData: number,
     description: string, 
-    location: string
+    location: string,
+    compelete: boolean
 }

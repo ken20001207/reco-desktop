@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Avatar, Toggle } from "rsuite";
+import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Avatar, Toggle, DatePicker } from "rsuite";
 import { EditEventDialogProps } from "../utils/interfaces";
 
 class EditEventDialog extends React.Component<EditEventDialogProps> {
@@ -19,9 +19,15 @@ class EditEventDialog extends React.Component<EditEventDialogProps> {
         if (this.props.inputing.allday === undefined || !this.props.inputing.allday)
             time = (
                 <FormGroup>
-                    <ControlLabel>時間</ControlLabel>
-                    <FormControl name="time" />
-                </FormGroup>
+                        <FormGroup>
+                        <ControlLabel>開始時間</ControlLabel>
+                        <FormControl name="startTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
+                        </FormGroup>
+                        <FormGroup>
+                        <ControlLabel>結束時間</ControlLabel>
+                        <FormControl name="endTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
+                        </FormGroup>
+                    </FormGroup>
             );
         return (
             <Modal show={this.props.editingEvent} aria-labelledby="form-dialog-title" width="xs">
@@ -45,7 +51,7 @@ class EditEventDialog extends React.Component<EditEventDialogProps> {
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>日期</ControlLabel>
-                            <FormControl name="date" />
+                            <FormControl name="date" accepter={DatePicker} oneTap />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>全天事件</ControlLabel>

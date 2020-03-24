@@ -1,28 +1,14 @@
 import React, { ReactNode } from "react";
-import { CreateEventDialogProps } from "../utils/interfaces";
+import { CreateTodoDialogProps } from "../utils/interfaces";
 
-import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, Toggle, DatePicker } from "rsuite";
+import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, DatePicker } from "rsuite";
 import { Calendar } from "../utils/classes";
 import { ItemDataType } from "rsuite/lib/@types/common";
 
-class CreateEventDialog extends React.Component<CreateEventDialogProps> {
+export default class CreateTodoDialog extends React.Component<CreateTodoDialogProps> {
     render() {
         if (this.props.inputing === undefined) return null;
-
-        var time = <p />;
-        if (this.props.inputing.allday === undefined || !this.props.inputing.allday)
-            time = (
-                    <FormGroup>
-                        <FormGroup>
-                        <ControlLabel>開始時間</ControlLabel>
-                        <FormControl name="startTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
-                        </FormGroup>
-                        <FormGroup>
-                        <ControlLabel>結束時間</ControlLabel>
-                        <FormControl name="endTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
-                        </FormGroup>
-                    </FormGroup>
-            );
+        
         var calendarOptions: Array<{ label: string; value: Calendar }> = [];
         if (this.props.userdata.calendars !== undefined) {
             calendarOptions = this.props.userdata.calendars.map(calendar => {
@@ -31,9 +17,9 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
         }
 
         return (
-            <Modal keyboard show={this.props.creatingEvent} aria-labelledby="form-dialog-title" width="xs">
-                <Modal.Header closeButton onClick={this.props.closeEventCreateDialog}>
-                    <h5>創建新事件</h5>
+            <Modal keyboard show={this.props.creatingTodo} aria-labelledby="form-dialog-title" width="xs">
+                <Modal.Header closeButton onClick={this.props.closeTodoCreateDialog}>
+                    <h5>創建新待辦事項</h5>
                 </Modal.Header>
                 <Modal.Body>
                     <Form formValue={this.props.inputing} onChange={this.props.handleFormChange}>
@@ -86,39 +72,25 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
                             />
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>事件標題</ControlLabel>
+                            <ControlLabel>待辦事項標題</ControlLabel>
                             <FormControl name="title" />
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>日期</ControlLabel>
-                            <FormControl name="date" accepter={DatePicker} oneTap />
+                            <ControlLabel>截止期限</ControlLabel>
+                            <FormControl name="deadLine" accepter={DatePicker} format="YYYY-MM-DD HH:mm" />
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>全天事件</ControlLabel>
-                            <FormControl accepter={Toggle} name="allday" />
-                        </FormGroup>
-                        {time}
-                        <FormGroup>
-                            <ControlLabel>詳細敘述</ControlLabel>
+                            <ControlLabel>補充敘述</ControlLabel>
                             <FormControl name="description" />
-                        </FormGroup>
-                        <FormGroup>
-                            <ControlLabel>地點</ControlLabel>
-                            <FormControl name="location" />
                         </FormGroup>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <FlexboxGrid>
-                        <FlexboxGrid.Item colspan={3} style={{ textAlign: "left" }}>
-                            <Button color="violet" onClick={this.props.openRepeatCreateDialog} loading={this.props.waiting}>
-                                創建系列
-                            </Button>
-                        </FlexboxGrid.Item>
                         <FlexboxGrid.Item colspan={15} />
                         <FlexboxGrid.Item colspan={6} style={{ textAlign: "right" }}>
-                            <Button onClick={this.props.closeEventCreateDialog}>取消</Button>
-                            <Button appearance="primary" onClick={this.props.createEvent} loading={this.props.waiting}>
+                            <Button onClick={this.props.closeTodoCreateDialog}>取消</Button>
+                            <Button appearance="primary" onClick={this.props.createTodo} loading={this.props.waiting}>
                                 創立
                             </Button>
                         </FlexboxGrid.Item>
@@ -128,5 +100,3 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
         );
     }
 }
-
-export default CreateEventDialog;

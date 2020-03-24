@@ -185,34 +185,68 @@ export class Event {
                 )
             );
 
-        popoverContent.push( !this.isAllDayEvent() ?
-            <div style={{marginTop: 18}}>
-                <p style={{display: "inline-block"}}>時間</p>
-                <h5 style={{marginLeft: 8, display: "inline-block"}}>{this.getDurationString()}</h5>
-            </div> : <div style={{marginTop: 18}}>
-                <p style={{display: "inline-block"}}>全天事件</p>
-            </div>
+        popoverContent.push(
+            !this.isAllDayEvent() ? (
+                <div style={{ marginTop: 18 }}>
+                    <p style={{ display: "inline-block" }}>時間</p>
+                    <h5 style={{ marginLeft: 8, display: "inline-block" }}>{this.getDurationString()}</h5>
+                </div>
+            ) : (
+                <div style={{ marginTop: 18 }}>
+                    <p style={{ display: "inline-block" }}>全天事件</p>
+                </div>
+            )
         );
 
         // Location
         if (this.location !== "")
             popoverContent.push(
-                <div style={{marginTop: 18}}>
-                <p style={{display: "inline-block"}}>地點</p>
-                <h5 style={{marginLeft: 8, display: "inline-block"}}>{this.location}</h5>
-            </div>
+                <div style={{ marginTop: 18 }}>
+                    <p style={{ display: "inline-block" }}>地點</p>
+                    <h5 style={{ marginLeft: 8, display: "inline-block" }}>{this.location}</h5>
+                </div>
             );
 
         // Description
         if (this.description !== "")
             popoverContent.push(
-                <div style={{marginTop: 18}}>
+                <div style={{ marginTop: 18 }}>
                     <Divider />
-                <h5 style={{ display: "inline-block"}}>{this.description}</h5>
-            </div>
+                    <h5 style={{ display: "inline-block" }}>{this.description}</h5>
+                </div>
             );
 
         return popoverContent;
+    }
+}
+
+const defaultTodo: Todo = {
+    id: "",
+    name: "",
+    DeadLine: new Date(),
+    calendarTitle: "",
+    description: "",
+    color: [],
+    complete: false
+};
+
+export class Todo {
+    id: string;
+    name: string;
+    DeadLine: Date;
+    calendarTitle: string;
+    description: string;
+    color: Array<String>;
+    complete: boolean;
+
+    constructor(JSONObject: Todo = defaultTodo) {
+        this.id = JSONObject.id === "" ? generateUUID() : JSONObject.id;
+        this.name = JSONObject.name;
+        this.DeadLine = new Date(JSONObject.DeadLine);
+        this.calendarTitle = JSONObject.calendarTitle;
+        this.description = JSONObject.description;
+        this.color = JSONObject.color;
+        this.complete = JSONObject.complete;
     }
 }
 
@@ -266,23 +300,36 @@ const defaultCalendar: Calendar = {
     color: ["#ffffff", "#ffffff"],
     label: "",
     events: [],
-    repeats: []
+    repeats: [],
+    todos: []
 };
 
 export class Calendar {
+    /** 行事曆標題 */
     title: string;
+    /** 預設色彩 */
     color: Array<string>;
     label: string;
+    /** 事件列表 */
     events: Array<Event>;
+    /** 重複事件列表 */
     repeats: Array<Repeat>;
+    /** 待辦事項列表 */
+    todos: Array<Todo>;
 
     constructor(JSONObject: Calendar = defaultCalendar) {
+        if (JSONObject.todos === undefined) JSONObject.todos = new Array<Todo>();
+
         this.title = JSONObject.title;
         this.color = JSONObject.color;
         this.label = this.title;
         this.events = JSONObject.events.map(event => {
             event.calendarTitle = this.title;
             return new Event(event);
+        });
+        this.todos = JSONObject.todos.map(todo => {
+            todo.calendarTitle = this.title;
+            return new Todo(todo);
         });
         this.repeats =
             JSONObject.repeats === undefined

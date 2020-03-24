@@ -5,11 +5,12 @@ import { Transition } from "react-transition-group";
 
 import DayView from "./components/DayView";
 import AllDayEvents from "./components/AllDayEvents";
+import TodoDisplay from "./components/TodoDisplay";
 import EditEventDialog from "./components/EditEventDialog";
 import CreateEventDialog from "./components/CreateEventDialog";
 import CreateRepeatDialog from "./components/CreateRepeatDialog";
 
-import { User, Event, Repeat, Calendar } from "./utils/classes";
+import { User, Event, Repeat, Calendar, Todo } from "./utils/classes";
 import { IndexStates, IndexProps, Inputing } from "./utils/interfaces";
 import { duration, defaultStyle, transitionStyles } from "./utils/config";
 import {
@@ -19,13 +20,17 @@ import {
     buildRepeatToEvent,
     createEvent,
     updateUserData,
-    getUserData
+    getUserData,
+    todosToDisplay,
+    createTodo
 } from "./utils/methods";
 
 import { Loader, Panel, FlexboxGrid, Divider } from "rsuite";
 
 import "rsuite/dist/styles/rsuite-dark.css";
 import "./App.css";
+import CreateTodoDialog from "./components/CreateTodoDialog";
+import EditTodoDialog from "./components/EditTodoDialog";
 
 class index extends React.Component<IndexProps, IndexStates> {
     dayviewContainer: React.RefObject<HTMLDivElement>;
@@ -41,23 +46,27 @@ class index extends React.Component<IndexProps, IndexStates> {
             userdata: new User(),
             filled: [],
             editingEvent: false,
+            editingTodo: false,
             creatingEvent: false,
             creatingRepeat: false,
+            creatingTodo: false,
             selectedEvent: new Event(),
+            selectedTodo: new Todo(),
             inputing: {
                 title: "",
-                date: "",
-                time: "",
+                date: new Date(),
                 ignore: false,
                 ignoreReason: "",
                 allday: false,
                 calendar: { label: "", value: new Calendar() },
-                startDate: "",
-                endDate: "",
+                startTime: new Date(),
+                endTime: new Date(),
+                deadLine: new Date(),
                 cycle: "",
                 description: "",
                 location: "",
-                repeatData: 0
+                repeatData: 0,
+                compelete: false
             },
             screenWidth: 0,
             screenHeight: 0,
@@ -73,14 +82,18 @@ class index extends React.Component<IndexProps, IndexStates> {
         this.openRepeatCreateDialog = this.openRepeatCreateDialog.bind(this);
         this.closeRepeatCreateDialog = this.closeRepeatCreateDialog.bind(this);
         this.updateEvent = this.updateEvent.bind(this);
+        this.updateTodo = this.updateTodo.bind(this);
         this.createEvent = this.createEvent.bind(this);
+        this.createTodo = this.createTodo.bind(this);
         this.createRepeat = this.createRepeat.bind(this);
         this.removeEvent = this.removeEvent.bind(this);
+        this.removeTodo = this.removeTodo.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.keyboardHandler = this.keyboardHandler.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
-        this.showEventInfoDrawer = this.showEventInfoDrawer.bind(this);
-        this.closeEventInfoDrawer = this.closeEventInfoDrawer.bind(this);
+        this.openTodoCreateDialog = this.openTodoCreateDialog.bind(this);
+        this.openTodoEditDialog = this.openTodoEditDialog.bind(this);
+        this.closeTodoCreateDialog = this.closeTodoCreateDialog.bind(this);
 
         this.dayviewContainer = React.createRef<HTMLDivElement>();
     }
@@ -137,25 +150,19 @@ class index extends React.Component<IndexProps, IndexStates> {
             editingEvent: true,
             inputing: {
                 title: event.title,
-                date: event.startTime.getFullYear() + "/" + (event.startTime.getMonth() + 1) + "/" + event.startTime.getDate(),
-                time:
-                    event.startTime.getHours() +
-                    ":" +
-                    event.startTime.getMinutes() +
-                    "~" +
-                    event.endTime.getHours() +
-                    ":" +
-                    event.endTime.getMinutes(),
+                date: event.startTime,
                 ignore: event.ignore,
                 ignoreReason: event.ignoreReason === undefined ? "" : event.ignoreReason,
                 allday: event.isAllDayEvent(),
                 calendar: { label: "", value: new Calendar() },
-                startDate: "",
-                endDate: "",
+                startTime: event.startTime,
+                endTime: event.endTime,
                 cycle: "",
+                deadLine: new Date(),
                 repeatData: 0,
                 description: event.description,
-                location: event.location
+                location: event.location,
+                compelete: false
             }
         });
     }
@@ -169,31 +176,64 @@ class index extends React.Component<IndexProps, IndexStates> {
             creatingEvent: true,
             inputing: {
                 title: "",
-                date:
-                    this.state.selectedDay.getFullYear() +
-                    "/" +
-                    (this.state.selectedDay.getMonth() + 1) +
-                    "/" +
-                    this.state.selectedDay.getDate(),
-                time:
-                    new Date().getHours() +
-                    ":" +
-                    new Date().getMinutes() +
-                    "~" +
-                    (new Date().getHours() + 1) +
-                    ":" +
-                    new Date().getMinutes(),
+                date: this.state.selectedDay,
                 calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
                 allday: false,
                 ignore: false,
                 ignoreReason: "",
-                startDate: "",
-                endDate: "",
+                startTime: this.state.selectedDay,
+                endTime: this.state.selectedDay,
                 cycle: "",
+                deadLine: new Date(),
+                description: "",
+                location: "",
+                repeatData: 0,
+                compelete: false
+            }
+        });
+    }
 
+    openTodoCreateDialog() {
+        this.setState({
+            creatingTodo: true,
+            inputing: {
+                title: "",
+                date: this.state.selectedDay,
+                deadLine: this.state.selectedDay,
+                calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
+                allday: false,
+                ignore: false,
+                ignoreReason: "",
+                startTime: new Date(),
+                endTime: new Date(),
+                cycle: "",
+                compelete: false,
                 description: "",
                 location: "",
                 repeatData: 0
+            }
+        });
+    }
+
+    openTodoEditDialog(todo: Todo) {
+        this.setState({
+            selectedTodo: todo,
+            editingTodo: true,
+            inputing: {
+                title: todo.name,
+                deadLine: todo.DeadLine,
+                date: new Date(),
+                ignore: false,
+                ignoreReason: "",
+                allday: false,
+                calendar: { label: "", value: new Calendar() },
+                startTime: new Date(),
+                endTime: new Date(),
+                cycle: "",
+                repeatData: 0,
+                description: todo.description,
+                location: "",
+                compelete: todo.complete
             }
         });
     }
@@ -204,35 +244,19 @@ class index extends React.Component<IndexProps, IndexStates> {
             creatingRepeat: true,
             inputing: {
                 title: "",
-                startDate:
-                    this.state.selectedDay.getFullYear() +
-                    "/" +
-                    (this.state.selectedDay.getMonth() + 1) +
-                    "/" +
-                    this.state.selectedDay.getDate(),
-                endDate:
-                    this.state.selectedDay.getFullYear() +
-                    "/" +
-                    (this.state.selectedDay.getMonth() + 1) +
-                    "/" +
-                    this.state.selectedDay.getDate(),
+                startTime: this.state.selectedDay,
+                endTime: this.state.selectedDay,
                 cycle: "Week",
                 repeatData: 0,
-                time:
-                    new Date().getHours() +
-                    ":" +
-                    new Date().getMinutes() +
-                    "~" +
-                    (new Date().getHours() + 1) +
-                    ":" +
-                    new Date().getMinutes(),
                 calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
                 allday: false,
-                date: "",
+                date: this.state.selectedDay,
+                deadLine: new Date(),
                 description: "",
                 location: "",
                 ignore: false,
-                ignoreReason: ""
+                ignoreReason: "",
+                compelete: false
             }
         });
     }
@@ -245,6 +269,10 @@ class index extends React.Component<IndexProps, IndexStates> {
         this.setState({ creatingEvent: false });
     }
 
+    closeTodoCreateDialog() {
+        this.setState({ creatingTodo: false });
+    }
+
     async createEvent() {
         this.setState({
             waiting: true
@@ -252,27 +280,21 @@ class index extends React.Component<IndexProps, IndexStates> {
         var newStartTime = new Date();
         var newEndTime = new Date();
         newStartTime.setFullYear(
-            +this.state.inputing.date.split("/")[0],
-            +this.state.inputing.date.split("/")[1] - 1,
-            +this.state.inputing.date.split("/")[2]
+            +this.state.inputing.date.getFullYear(),
+            +this.state.inputing.date.getMonth(),
+            +this.state.inputing.date.getDate()
         );
         newEndTime.setFullYear(
-            +this.state.inputing.date.split("/")[0],
-            +this.state.inputing.date.split("/")[1] - 1,
-            +this.state.inputing.date.split("/")[2]
+            +this.state.inputing.date.getFullYear(),
+            +this.state.inputing.date.getMonth(),
+            +this.state.inputing.date.getDate()
         );
         if (this.state.inputing.allday) {
             newStartTime.setHours(0, 0);
             newEndTime.setHours(24, 0);
         } else {
-            newStartTime.setHours(
-                +this.state.inputing.time.split("~")[0].split(":")[0],
-                +this.state.inputing.time.split("~")[0].split(":")[1]
-            );
-            newEndTime.setHours(
-                +this.state.inputing.time.split("~")[1].split(":")[0],
-                +this.state.inputing.time.split("~")[1].split(":")[1]
-            );
+            newStartTime.setHours(+this.state.inputing.startTime.getHours(), +this.state.inputing.startTime.getMinutes());
+            newEndTime.setHours(+this.state.inputing.endTime.getHours(), +this.state.inputing.endTime.getMinutes());
         }
         var newdata = this.state.userdata;
         newdata.calendars.map(calendar => {
@@ -303,6 +325,28 @@ class index extends React.Component<IndexProps, IndexStates> {
         updateUserData(newdata);
     }
 
+    async createTodo() {
+        this.setState({
+            waiting: true
+        });
+        var newdeadLine = this.state.inputing.deadLine;
+        var newdata = this.state.userdata;
+        newdata.calendars.map(calendar => {
+            if (calendar.title === this.state.inputing.calendar.label) {
+                calendar.todos.push(
+                    createTodo(this.state.inputing.title, calendar.color, this.state.inputing.description, calendar.title, newdeadLine)
+                );
+            }
+            return null;
+        });
+
+        // 更新視圖
+        this.setState({ userdata: newdata, waiting: false, creatingTodo: false });
+
+        // 上傳更新到資料庫
+        updateUserData(newdata);
+    }
+
     async createRepeat() {
         this.setState({
             waiting: true
@@ -310,39 +354,33 @@ class index extends React.Component<IndexProps, IndexStates> {
         var startDate = new Date();
         var endDate = new Date();
         startDate.setFullYear(
-            +this.state.inputing.startDate.split("/")[0],
-            +this.state.inputing.startDate.split("/")[1] - 1,
-            +this.state.inputing.startDate.split("/")[2]
+            +this.state.inputing.date.getFullYear(),
+            +this.state.inputing.date.getMonth(),
+            +this.state.inputing.date.getDate()
         );
         endDate.setFullYear(
-            +this.state.inputing.endDate.split("/")[0],
-            +this.state.inputing.endDate.split("/")[1] - 1,
-            +this.state.inputing.endDate.split("/")[2]
+            +this.state.inputing.date.getFullYear(),
+            +this.state.inputing.date.getMonth(),
+            +this.state.inputing.date.getDate()
         );
         var newStartTime = new Date();
         var newEndTime = new Date();
         newStartTime.setFullYear(
-            +this.state.inputing.startDate.split("/")[0],
-            +this.state.inputing.startDate.split("/")[1] - 1,
-            +this.state.inputing.startDate.split("/")[2]
+            +this.state.inputing.startTime.getFullYear(),
+            +this.state.inputing.startTime.getMonth(),
+            +this.state.inputing.startTime.getDate()
         );
         newEndTime.setFullYear(
-            +this.state.inputing.startDate.split("/")[0],
-            +this.state.inputing.startDate.split("/")[1] - 1,
-            +this.state.inputing.startDate.split("/")[2]
+            +this.state.inputing.endTime.getFullYear(),
+            +this.state.inputing.endTime.getMonth(),
+            +this.state.inputing.endTime.getDate()
         );
         if (this.state.inputing.allday) {
             newStartTime.setHours(0, 0);
             newEndTime.setHours(23, 59);
         } else {
-            newStartTime.setHours(
-                +this.state.inputing.time.split("~")[0].split(":")[0],
-                +this.state.inputing.time.split("~")[0].split(":")[1]
-            );
-            newEndTime.setHours(
-                +this.state.inputing.time.split("~")[1].split(":")[0],
-                +this.state.inputing.time.split("~")[1].split(":")[1]
-            );
+            newStartTime.setHours(+this.state.inputing.startTime.getHours(), +this.state.inputing.startTime.getMinutes());
+            newEndTime.setHours(+this.state.inputing.endTime.getHours(), +this.state.inputing.endTime.getMinutes());
         }
         var newdata = this.state.userdata;
         newdata.calendars.map(calendar => {
@@ -378,27 +416,21 @@ class index extends React.Component<IndexProps, IndexStates> {
         var newStartTime = new Date();
         var newEndTime = new Date();
         newStartTime.setFullYear(
-            +this.state.inputing.date.split("/")[0],
-            +this.state.inputing.date.split("/")[1] - 1,
-            +this.state.inputing.date.split("/")[2]
+            +this.state.inputing.date.getFullYear(),
+            +this.state.inputing.date.getMonth(),
+            +this.state.inputing.date.getDate()
         );
         newEndTime.setFullYear(
-            +this.state.inputing.date.split("/")[0],
-            +this.state.inputing.date.split("/")[1] - 1,
-            +this.state.inputing.date.split("/")[2]
+            +this.state.inputing.date.getFullYear(),
+            +this.state.inputing.date.getMonth(),
+            +this.state.inputing.date.getDate()
         );
         if (this.state.inputing.allday) {
             newStartTime.setHours(0, 0);
             newEndTime.setHours(24, 0);
         } else {
-            newStartTime.setHours(
-                +this.state.inputing.time.split("~")[0].split(":")[0],
-                +this.state.inputing.time.split("~")[0].split(":")[1]
-            );
-            newEndTime.setHours(
-                +this.state.inputing.time.split("~")[1].split(":")[0],
-                +this.state.inputing.time.split("~")[1].split(":")[1]
-            );
+            newStartTime.setHours(+this.state.inputing.startTime.getHours(), +this.state.inputing.startTime.getMinutes());
+            newEndTime.setHours(+this.state.inputing.endTime.getHours(), +this.state.inputing.endTime.getMinutes());
         }
         var newdata = this.state.userdata;
         newdata.calendars.map(calendar => {
@@ -450,6 +482,58 @@ class index extends React.Component<IndexProps, IndexStates> {
         updateUserData(newdata);
     }
 
+    async updateTodo() {
+        this.setState({
+            waiting: true
+        });
+        var newdeadLine = this.state.inputing.deadLine;
+
+        var newdata = this.state.userdata;
+        newdata.calendars.map(calendar => {
+            calendar.todos.map(todo => {
+                if (todo.id === this.state.selectedTodo.id) {
+                    todo.DeadLine = newdeadLine;
+                    todo.name = this.state.inputing.title;
+                    todo.description = this.state.inputing.description;
+                    todo.complete = this.state.inputing.compelete;
+                }
+                return null;
+            });
+            return null;
+        });
+
+        // 更新視圖
+        var etd = eventsToDispay(newdata.calendars, new Date());
+        this.setState({ userdata: newdata, eventsToDispay: etd, waiting: false, editingTodo: false });
+
+        // 上傳變更到資料庫
+        updateUserData(newdata);
+    }
+
+    async removeTodo() {
+        this.setState({
+            removing: true
+        });
+        var newdata = this.state.userdata;
+        newdata.calendars.map(calendar => {
+            var targetTodo = null;
+            calendar.todos.map(todo => {
+                if (todo.id === this.state.selectedTodo.id) {
+                    targetTodo = todo;
+                }
+                return null;
+            });
+            if (targetTodo != null) calendar.todos.splice(calendar.todos.indexOf(targetTodo), 1);
+            return null;
+        });
+
+        // 更新視圖
+        this.setState({ userdata: newdata, removing: false, editingTodo: false });
+
+        // 上傳變更到資料庫
+        updateUserData(newdata);
+    }
+
     handleFormChange(value: Inputing) {
         this.setState({
             inputing: {
@@ -458,46 +542,33 @@ class index extends React.Component<IndexProps, IndexStates> {
                 calendar: value.calendar,
                 cycle: value.cycle,
                 repeatData: value.repeatData,
-                time: value.time,
                 date: value.date,
                 title: value.title,
                 allday: value.allday,
-                startDate: value.startDate,
-                endDate: value.endDate,
+                startTime: value.startTime,
+                endTime: value.endTime,
                 description: value.description,
-                location: value.location
+                location: value.location,
+                deadLine: value.deadLine,
+                compelete: value.compelete
             }
         });
     }
 
-    showEventInfoDrawer(event: Event) {
-        this.setState({
-            selectedEvent: event,
-            displayEventInfoDrawer: true
-        });
-    }
-
-    closeEventInfoDrawer() {
-        this.setState({
-            displayEventInfoDrawer: false
-        });
-    }
-
     render() {
-        console.log(this.state.now);
-
         var DayviewContent = <Loader />;
         var AllDayEventsContent = <Loader />;
+        var TodosContent = <Loader />;
         if (this.state.userdata.calendars !== undefined) {
             var etd = eventsToDispay(this.state.userdata.calendars, this.state.selectedDay);
             var ade = allDayEventsToDispay(this.state.userdata.calendars, this.state.selectedDay);
+            var todos = todosToDisplay(this.state.userdata.calendars, this.state.selectedDay);
             DayviewContent = (
                 <DayView
                     container={this.dayviewContainer}
                     events={etd}
                     openEventEditDialog={this.openEventEditDialog}
                     openEventCreateDialog={this.openEventCreateDialog}
-                    showEventInfoDrawer={this.showEventInfoDrawer}
                 />
             );
             AllDayEventsContent = (
@@ -506,7 +577,14 @@ class index extends React.Component<IndexProps, IndexStates> {
                     events={ade}
                     openEventEditDialog={this.openEventEditDialog}
                     openEventCreateDialog={this.openEventCreateDialog}
-                    showEventInfoDrawer={this.showEventInfoDrawer}
+                />
+            );
+            TodosContent = (
+                <TodoDisplay
+                    container={this.dayviewContainer}
+                    todos={todos}
+                    openTodoEditDialog={this.openTodoEditDialog}
+                    openTodoCreateDialog={this.openTodoCreateDialog}
                 />
             );
         }
@@ -611,7 +689,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                         </h3>
                     </div>
                     <div className="day-view-panel">
-                        <div className="day-view-scroll">
+                        <div className="day-view-scroll" onDoubleClick={this.openTodoCreateDialog}>
                             <Transition in={this.state.loaded} timeout={duration}>
                                 {state => (
                                     <div
@@ -621,6 +699,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                                         }}
                                     >
                                         {AllDayEventsContent}
+                                        {TodosContent}
                                     </div>
                                 )}
                             </Transition>
@@ -685,6 +764,18 @@ class index extends React.Component<IndexProps, IndexStates> {
                     waiting={this.state.waiting}
                 />
 
+                <EditTodoDialog
+                    editingTodo={this.state.editingTodo}
+                    closeTodoEditDialog={() => this.setState({ editingTodo: false })}
+                    selectedTodo={this.state.selectedTodo}
+                    inputing={this.state.inputing}
+                    handleFormChange={this.handleFormChange}
+                    removeTodo={this.removeTodo}
+                    removing={this.state.removing}
+                    updateTodo={this.updateTodo}
+                    waiting={this.state.waiting}
+                />
+
                 <CreateEventDialog
                     userdata={this.state.userdata}
                     creatingEvent={this.state.creatingEvent}
@@ -694,6 +785,16 @@ class index extends React.Component<IndexProps, IndexStates> {
                     createEvent={this.createEvent}
                     waiting={this.state.waiting}
                     openRepeatCreateDialog={this.openRepeatCreateDialog}
+                />
+
+                <CreateTodoDialog
+                    userdata={this.state.userdata}
+                    creatingTodo={this.state.creatingTodo}
+                    closeTodoCreateDialog={this.closeTodoCreateDialog}
+                    inputing={this.state.inputing}
+                    handleFormChange={this.handleFormChange}
+                    createTodo={this.createTodo}
+                    waiting={this.state.waiting}
                 />
 
                 <CreateRepeatDialog

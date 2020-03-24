@@ -1,5 +1,5 @@
 import { Notification } from "rsuite";
-import { Event, Calendar, Repeat, User } from "./classes";
+import { Event, Calendar, Repeat, User, Todo } from "./classes";
 import { apiURL } from "./config";
 import React from "react";
 
@@ -243,6 +243,17 @@ export function createEvent(
     return newEvent;
 }
 
+/** 透過參數建立新 Todo */
+export function createTodo(name: string, color: Array<string>, description: string = "", calendarTitle: string, deadLine: Date) {
+    var newTodo = new Todo();
+    newTodo.name = name;
+    newTodo.color = color;
+    newTodo.DeadLine = deadLine;
+    newTodo.description = description;
+    newTodo.calendarTitle = calendarTitle;
+    return newTodo;
+}
+
 export function buildRepeatToEvent(userdata: User, date: Date) {
     return new Promise<{ data: User; changed: boolean }>(resolve => {
         date.setHours(12, 0);
@@ -338,4 +349,34 @@ export function allDayEventsToDispay(calendars: Array<Calendar>, date: Date) {
         return null;
     });
     return allDayEventsToDispay;
+}
+
+export function todosToDisplay(calendars: Array<Calendar>, date: Date) {
+    var todosToDisplay: Array<Todo> = [];
+    calendars.map(calendar => {
+        calendar.todos.map(todo => {
+            todo = new Todo(todo);
+            if (
+                todo.DeadLine.getFullYear() === date.getFullYear() &&
+                todo.DeadLine.getMonth() === date.getMonth() &&
+                todo.DeadLine.getDate() >= date.getDate() &&
+                todo.DeadLine.getDate() <= date.getDate() + 3 &&
+                !todo.complete
+            ) {
+                todosToDisplay.push(todo);
+            }
+            if (
+                todo.DeadLine.getFullYear() === date.getFullYear() &&
+                todo.DeadLine.getMonth() === date.getMonth() &&
+                todo.DeadLine.getDate() === date.getDate() &&
+                todo.complete
+            ) {
+                todosToDisplay.push(todo);
+            }
+            return null;
+        });
+
+        return null;
+    });
+    return todosToDisplay;
 }
