@@ -15,7 +15,8 @@ export interface IndexStates {
     creatingRepeat: boolean,
     selectedEvent: Event,
     inputing: Inputing,
-    displayEventInfoDrawer: boolean
+    displayEventInfoDrawer: boolean,
+    now: Date
 }
 
 /** index 組件 Props */

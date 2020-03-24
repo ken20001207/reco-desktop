@@ -1,7 +1,7 @@
 import { Notification } from "rsuite";
 import { Event, Calendar, Repeat, User } from "./classes";
-import React from "react";
 import { apiURL } from "./config";
+import React from "react";
 
 /** 更新使用者資料 */
 export function updateUserData(data: User) {

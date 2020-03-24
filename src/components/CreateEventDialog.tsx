@@ -1,11 +1,11 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { CreateEventDialogProps } from "../utils/interfaces";
 
 import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, Toggle } from "rsuite";
 import { Calendar } from "../utils/classes";
+import { ItemDataType } from "rsuite/lib/@types/common";
 
 class CreateEventDialog extends React.Component<CreateEventDialogProps> {
-
     render() {
         if (this.props.inputing === undefined) return null;
 
@@ -17,7 +17,7 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
                     <FormControl name="time" />
                 </FormGroup>
             );
-        var calendarOptions: Array<{ label: string, value: Calendar }> = [];
+        var calendarOptions: Array<{ label: string; value: Calendar }> = [];
         if (this.props.userdata.calendars !== undefined) {
             calendarOptions = this.props.userdata.calendars.map(calendar => {
                 return { label: calendar.title, value: calendar };
@@ -33,7 +33,51 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
                     <Form formValue={this.props.inputing} onChange={this.props.handleFormChange}>
                         <FormGroup>
                             <ControlLabel>行事曆</ControlLabel>
-                            <FormControl name="calendar" data={calendarOptions} accepter={SelectPicker} />
+                            <FormControl
+                                name="calendar"
+                                data={calendarOptions}
+                                style={{ width: 180, height: 60 }}
+                                appearance="subtle"
+                                accepter={SelectPicker}
+                                renderMenuItem={(label: ReactNode, item: ItemDataType) => {
+                                    return (
+                                        <div
+                                            style={{
+                                                backgroundImage:
+                                                    "linear-gradient(315deg, " +
+                                                    item.value.color[0] +
+                                                    " 0%, " +
+                                                    item.value.color[1] +
+                                                    " 100%)",
+                                                padding: 8,
+                                                borderRadius: 8,
+                                                color: "white"
+                                            }}
+                                        >
+                                            <p style={{ fontWeight: "bolder" }}>{label}</p>
+                                        </div>
+                                    );
+                                }}
+                                renderValue={(value: Calendar, item: any) => {
+                                    return (
+                                        <div
+                                            style={{
+                                                backgroundImage:
+                                                    "linear-gradient(315deg, " +
+                                                    item.value.color[0] +
+                                                    " 0%, " +
+                                                    item.value.color[1] +
+                                                    " 100%)",
+                                                padding: 8,
+                                                borderRadius: 8,
+                                                color: "white"
+                                            }}
+                                        >
+                                            <p style={{ fontWeight: "bolder" }}>{value.title}</p>
+                                        </div>
+                                    );
+                                }}
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>事件標題</ControlLabel>

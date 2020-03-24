@@ -29,6 +29,7 @@ import "./App.css";
 
 class index extends React.Component<IndexProps, IndexStates> {
     dayviewContainer: React.RefObject<HTMLDivElement>;
+    interval: NodeJS.Timeout = setInterval(() => this.setState({ now: new Date() }), 1000);
     constructor(props: Readonly<IndexProps>) {
         super(props);
         this.state = {
@@ -60,7 +61,8 @@ class index extends React.Component<IndexProps, IndexStates> {
             },
             screenWidth: 0,
             screenHeight: 0,
-            displayEventInfoDrawer: false
+            displayEventInfoDrawer: false,
+            now: new Date()
         };
 
         this.handleDayClick = this.handleDayClick.bind(this);
@@ -103,6 +105,10 @@ class index extends React.Component<IndexProps, IndexStates> {
                 creatingRepeat: false
             });
         }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     async componentDidMount() {
@@ -478,6 +484,8 @@ class index extends React.Component<IndexProps, IndexStates> {
     }
 
     render() {
+        console.log(this.state.now);
+
         var DayviewContent = <Loader />;
         var AllDayEventsContent = <Loader />;
         if (this.state.userdata.calendars !== undefined) {
@@ -514,17 +522,28 @@ class index extends React.Component<IndexProps, IndexStates> {
 
         var NowLine =
             getDayDescription(this.state.selectedDay) === "今天" ? (
-                <Divider
+                <div
                     style={{
+                        zIndex: 2000,
                         position: "absolute",
-                        top: new Date().getHours() * 60 + new Date().getMinutes(),
-                        backgroundColor: "red",
+                        top: this.state.now.getHours() * 60 + this.state.now.getMinutes(),
                         width: "100%",
-                        marginLeft: 64,
-                        marginTop: 0,
-                        zIndex: 2000
+                        margin: 0
                     }}
-                />
+                >
+                    <p style={{ lineHeight: 0, color: "red", fontWeight: "bolder" }}>
+                        {this.state.now.getHours() + ":" + this.state.now.getMinutes()}
+                    </p>
+                    <Divider
+                        style={{
+                            backgroundColor: "red",
+                            width: "90%",
+                            marginLeft: 48,
+                            marginTop: 0,
+                            height: 2
+                        }}
+                    />
+                </div>
             ) : null;
 
         const monthNames = [
