@@ -1,11 +1,13 @@
 import React from "react";
-import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Avatar, Toggle, DatePicker } from "rsuite";
+import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Avatar, Toggle, DatePicker, AutoComplete } from "rsuite";
 import { EditEventDialogProps } from "../utils/interfaces";
+import { getEventsAutoCompleteData } from "../utils/getAutoCompeleteData";
 
 class EditEventDialog extends React.Component<EditEventDialogProps> {
-
     render() {
         if (this.props.inputing === undefined) return null;
+
+        const { titles, descriptions, locations } = getEventsAutoCompleteData(this.props.inputing.calendar);
 
         var ignoreReason = <p />;
         if (this.props.inputing.ignore !== undefined)
@@ -14,20 +16,22 @@ class EditEventDialog extends React.Component<EditEventDialogProps> {
                     <ControlLabel>忽略原因</ControlLabel>
                     <FormControl name="ignoreReason" />
                 </FormGroup>
-            ) : <p />;
+            ) : (
+                <p />
+            );
         var time = <p />;
         if (this.props.inputing.allday === undefined || !this.props.inputing.allday)
             time = (
                 <FormGroup>
-                        <FormGroup>
+                    <FormGroup>
                         <ControlLabel>開始時間</ControlLabel>
                         <FormControl name="startTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
-                        </FormGroup>
-                        <FormGroup>
+                    </FormGroup>
+                    <FormGroup>
                         <ControlLabel>結束時間</ControlLabel>
                         <FormControl name="endTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
-                        </FormGroup>
                     </FormGroup>
+                </FormGroup>
             );
         return (
             <Modal show={this.props.editingEvent} aria-labelledby="form-dialog-title" width="xs">
@@ -35,7 +39,11 @@ class EditEventDialog extends React.Component<EditEventDialogProps> {
                     <Avatar
                         style={{
                             backgroundImage:
-                                "linear-gradient(315deg, " + this.props.selectedEvent.color[0] + " 0%, " + this.props.selectedEvent.color[1] + " 100%)",
+                                "linear-gradient(315deg, " +
+                                this.props.selectedEvent.color[0] +
+                                " 0%, " +
+                                this.props.selectedEvent.color[1] +
+                                " 100%)",
                             color: "#ffffff"
                         }}
                     >
@@ -47,28 +55,28 @@ class EditEventDialog extends React.Component<EditEventDialogProps> {
                     <Form formValue={this.props.inputing} onChange={this.props.handleFormChange}>
                         <FormGroup>
                             <ControlLabel>事件標題</ControlLabel>
-                            <FormControl name="title" />
+                            <FormControl name="title" accepter={AutoComplete} data={titles} className="DialogFormControl" autoComplete="off"/>
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>日期</ControlLabel>
-                            <FormControl name="date" accepter={DatePicker} oneTap />
+                            <FormControl name="date" accepter={DatePicker} oneTap className="DialogFormControl" />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>全天事件</ControlLabel>
-                            <FormControl accepter={Toggle} name="allday" />
+                            <FormControl accepter={Toggle} name="allday" checked={this.props.inputing.allday} />
                         </FormGroup>
                         {time}
                         <FormGroup>
                             <ControlLabel>詳細敘述</ControlLabel>
-                            <FormControl name="description" />
+                            <FormControl name="description" accepter={AutoComplete} data={descriptions} className="DialogFormControl" />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>地點</ControlLabel>
-                            <FormControl name="location" />
+                            <FormControl name="location" accepter={AutoComplete} data={locations} className="DialogFormControl" />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>已忽略的事件</ControlLabel>
-                            <FormControl accepter={Toggle} name="ignore" />
+                            <FormControl accepter={Toggle} name="ignore" checked={this.props.inputing.ignore} />
                         </FormGroup>
                         {ignoreReason}
                     </Form>

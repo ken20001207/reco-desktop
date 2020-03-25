@@ -1,27 +1,42 @@
 import React, { ReactNode } from "react";
 import { CreateEventDialogProps } from "../utils/interfaces";
 
-import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, Toggle, DatePicker } from "rsuite";
+import {
+    FlexboxGrid,
+    Button,
+    Form,
+    FormGroup,
+    FormControl,
+    ControlLabel,
+    SelectPicker,
+    Modal,
+    Toggle,
+    DatePicker,
+    AutoComplete
+} from "rsuite";
 import { Calendar } from "../utils/classes";
 import { ItemDataType } from "rsuite/lib/@types/common";
+import { getEventsAutoCompleteData } from "../utils/getAutoCompeleteData";
 
 class CreateEventDialog extends React.Component<CreateEventDialogProps> {
     render() {
         if (this.props.inputing === undefined) return null;
 
+        const { titles, descriptions, locations } = getEventsAutoCompleteData(this.props.inputing.calendar);
+
         var time = <p />;
         if (this.props.inputing.allday === undefined || !this.props.inputing.allday)
             time = (
+                <FormGroup>
                     <FormGroup>
-                        <FormGroup>
                         <ControlLabel>開始時間</ControlLabel>
                         <FormControl name="startTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
-                        </FormGroup>
-                        <FormGroup>
+                    </FormGroup>
+                    <FormGroup>
                         <ControlLabel>結束時間</ControlLabel>
                         <FormControl name="endTime" accepter={DatePicker} format="HH:mm" ranges={[]} />
-                        </FormGroup>
                     </FormGroup>
+                </FormGroup>
             );
         var calendarOptions: Array<{ label: string; value: Calendar }> = [];
         if (this.props.userdata.calendars !== undefined) {
@@ -42,6 +57,7 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
                             <FormControl
                                 name="calendar"
                                 data={calendarOptions}
+                                defaultValue={this.props.inputing.calendar}
                                 style={{ width: 180, height: 60 }}
                                 appearance="subtle"
                                 accepter={SelectPicker}
@@ -87,11 +103,17 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>事件標題</ControlLabel>
-                            <FormControl name="title" />
+                            <FormControl
+                                className="DialogFormControl"
+                                name="title"
+                                accepter={AutoComplete}
+                                autoComplete="off"
+                                data={titles}
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>日期</ControlLabel>
-                            <FormControl name="date" accepter={DatePicker} oneTap />
+                            <FormControl className="DialogFormControl" name="date" accepter={DatePicker} oneTap />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>全天事件</ControlLabel>
@@ -100,11 +122,23 @@ class CreateEventDialog extends React.Component<CreateEventDialogProps> {
                         {time}
                         <FormGroup>
                             <ControlLabel>詳細敘述</ControlLabel>
-                            <FormControl name="description" />
+                            <FormControl
+                                className="DialogFormControl"
+                                name="description"
+                                accepter={AutoComplete}
+                                autoComplete="off"
+                                data={descriptions}
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>地點</ControlLabel>
-                            <FormControl name="location" />
+                            <FormControl
+                                className="DialogFormControl"
+                                name="location"
+                                accepter={AutoComplete}
+                                autoComplete="off"
+                                data={locations}
+                            />
                         </FormGroup>
                     </Form>
                 </Modal.Body>

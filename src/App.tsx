@@ -58,7 +58,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 ignore: false,
                 ignoreReason: "",
                 allday: false,
-                calendar: { label: "", value: new Calendar() },
+                calendar: new Calendar(),
                 startTime: new Date(),
                 endTime: new Date(),
                 deadLine: new Date(),
@@ -66,7 +66,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 description: "",
                 location: "",
                 repeatData: 0,
-                compelete: false
+                complete: false
             },
             screenWidth: 0,
             screenHeight: 0,
@@ -145,6 +145,14 @@ class index extends React.Component<IndexProps, IndexStates> {
     }
 
     openEventEditDialog(event: Event) {
+        var cal = new Calendar();
+        this.state.userdata.calendars.map(calendar => {
+            if (calendar.title === event.calendarTitle) {
+                cal = calendar;
+            }
+            return null;
+        });
+
         this.setState({
             selectedEvent: event,
             editingEvent: true,
@@ -154,7 +162,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 ignore: event.ignore,
                 ignoreReason: event.ignoreReason === undefined ? "" : event.ignoreReason,
                 allday: event.isAllDayEvent(),
-                calendar: { label: "", value: new Calendar() },
+                calendar: cal,
                 startTime: event.startTime,
                 endTime: event.endTime,
                 cycle: "",
@@ -162,7 +170,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 repeatData: 0,
                 description: event.description,
                 location: event.location,
-                compelete: false
+                complete: false
             }
         });
     }
@@ -177,7 +185,7 @@ class index extends React.Component<IndexProps, IndexStates> {
             inputing: {
                 title: "",
                 date: this.state.selectedDay,
-                calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
+                calendar: this.state.userdata.calendars[0],
                 allday: false,
                 ignore: false,
                 ignoreReason: "",
@@ -188,7 +196,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 description: "",
                 location: "",
                 repeatData: 0,
-                compelete: false
+                complete: false
             }
         });
     }
@@ -200,14 +208,14 @@ class index extends React.Component<IndexProps, IndexStates> {
                 title: "",
                 date: this.state.selectedDay,
                 deadLine: this.state.selectedDay,
-                calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
+                calendar: this.state.userdata.calendars[0],
                 allday: false,
                 ignore: false,
                 ignoreReason: "",
                 startTime: new Date(),
                 endTime: new Date(),
                 cycle: "",
-                compelete: false,
+                complete: false,
                 description: "",
                 location: "",
                 repeatData: 0
@@ -226,14 +234,14 @@ class index extends React.Component<IndexProps, IndexStates> {
                 ignore: false,
                 ignoreReason: "",
                 allday: false,
-                calendar: { label: "", value: new Calendar() },
+                calendar: new Calendar(),
                 startTime: new Date(),
                 endTime: new Date(),
                 cycle: "",
                 repeatData: 0,
                 description: todo.description,
                 location: "",
-                compelete: todo.complete
+                complete: todo.complete
             }
         });
     }
@@ -248,7 +256,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 endTime: this.state.selectedDay,
                 cycle: "Week",
                 repeatData: 0,
-                calendar: { label: this.state.userdata.calendars[0].title, value: this.state.userdata.calendars[0] },
+                calendar: this.state.userdata.calendars[0],
                 allday: false,
                 date: this.state.selectedDay,
                 deadLine: new Date(),
@@ -256,7 +264,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 location: "",
                 ignore: false,
                 ignoreReason: "",
-                compelete: false
+                complete: false
             }
         });
     }
@@ -495,7 +503,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                     todo.DeadLine = newdeadLine;
                     todo.name = this.state.inputing.title;
                     todo.description = this.state.inputing.description;
-                    todo.complete = this.state.inputing.compelete;
+                    todo.complete = this.state.inputing.complete;
                 }
                 return null;
             });
@@ -550,7 +558,7 @@ class index extends React.Component<IndexProps, IndexStates> {
                 description: value.description,
                 location: value.location,
                 deadLine: value.deadLine,
-                compelete: value.compelete
+                complete: value.complete
             }
         });
     }

@@ -151,12 +151,12 @@ export interface Inputing {
     deadLine: Date,
     ignoreReason: string,
     allday: boolean,
-    calendar: { label: string, value: Calendar },
+    calendar: Calendar,
     startTime: Date,
     endTime: Date,
     cycle: string,
     repeatData: number,
     description: string, 
     location: string,
-    compelete: boolean
+    complete: boolean
 }

@@ -2,6 +2,10 @@
     -webkit-app-region: drag;
 }
 
+.DialogFormControl {
+    width: 280px;
+}
+
 .ignoredEventCardGrid {
     z-index: 1;
 }

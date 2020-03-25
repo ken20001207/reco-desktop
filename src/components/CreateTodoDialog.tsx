@@ -1,14 +1,17 @@
 import React, { ReactNode } from "react";
 import { CreateTodoDialogProps } from "../utils/interfaces";
 
-import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, DatePicker } from "rsuite";
+import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, DatePicker, AutoComplete } from "rsuite";
 import { Calendar } from "../utils/classes";
 import { ItemDataType } from "rsuite/lib/@types/common";
+import { getTodosAutoCompleteData } from "../utils/getAutoCompeleteData";
 
 export default class CreateTodoDialog extends React.Component<CreateTodoDialogProps> {
     render() {
         if (this.props.inputing === undefined) return null;
-        
+
+        const { titles, descriptions } = getTodosAutoCompleteData(this.props.inputing.calendar);
+
         var calendarOptions: Array<{ label: string; value: Calendar }> = [];
         if (this.props.userdata.calendars !== undefined) {
             calendarOptions = this.props.userdata.calendars.map(calendar => {
@@ -73,15 +76,27 @@ export default class CreateTodoDialog extends React.Component<CreateTodoDialogPr
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>待辦事項標題</ControlLabel>
-                            <FormControl name="title" />
+                            <FormControl
+                                name="title"
+                                accepter={AutoComplete}
+                                data={titles}
+                                className="DialogFormControl"
+                                autoComplete="off"
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>截止期限</ControlLabel>
-                            <FormControl name="deadLine" accepter={DatePicker} format="YYYY-MM-DD HH:mm" />
+                            <FormControl name="deadLine" accepter={DatePicker} format="YYYY-MM-DD HH:mm" className="DialogFormControl" />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>補充敘述</ControlLabel>
-                            <FormControl name="description" />
+                            <FormControl
+                                name="description"
+                                accepter={AutoComplete}
+                                data={descriptions}
+                                className="DialogFormControl"
+                                autoComplete="off"
+                            />
                         </FormGroup>
                     </Form>
                 </Modal.Body>
