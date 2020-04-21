@@ -1,79 +1,190 @@
 import React from "react";
-import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Avatar, Toggle, DatePicker, AutoComplete } from "rsuite";
-import { EditTodoDialogProps } from "../utils/interfaces";
-import { getTodosAutoCompleteData } from "../utils/getAutoCompeleteData";
+import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete } from "rsuite";
+import { store } from "../redux/store";
+import { AppState, TodoData, CalendarData } from "../types";
+import { connect } from "react-redux";
+import { toggleEditingTodo, deleteTodo } from "../redux/actions";
+import update_todo from "../utils/update_todo";
+import { fix_todo_time } from "../utils/fix_time";
+import download_data from "../utils/download_datas";
+import { Notification } from "rsuite";
+import delete_item from "../utils/delete_item";
 
-class EditTodoDialog extends React.Component<EditTodoDialogProps> {
+interface Props {
+    todo: TodoData | null;
+    toggleEditingTodo: () => void;
+    editingTodo: boolean;
+    deleteTodo: (_id: string) => void;
+}
+
+interface States {
+    removing: boolean;
+    loading: boolean;
+    calendarData: CalendarData;
+    _id: string;
+    calendar: string;
+    title: string;
+    deadline: Date;
+    color: Array<string>;
+    complete: boolean;
+    description: string;
+}
+
+class EditTodoDialog extends React.Component<Props, States> {
+    constructor(props: Props) {
+        super(props);
+        this.handleInput = this.handleInput.bind(this);
+        this.updateTodo = this.updateTodo.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps: Props) {
+        if (nextProps.todo !== null) {
+            const calendar = store
+                .getState()
+                .systemStateReducer.calendars.filter((calendar) => calendar._id === nextProps.todo?.calendar)[0];
+            if (calendar._id === undefined) return;
+            this.setState({
+                calendarData: calendar,
+                _id: nextProps.todo._id,
+                calendar: calendar._id,
+                title: nextProps.todo.title,
+                deadline: nextProps.todo.deadline,
+                color: nextProps.todo.color,
+                complete: nextProps.todo.complete,
+                description: nextProps.todo.description,
+            });
+        }
+    }
+
+    handleInput(formValue: any) {
+        this.setState({
+            calendarData: formValue.calendarData,
+            title: formValue.title,
+            deadline: formValue.deadline,
+            color: formValue.color,
+            complete: formValue.complete,
+            description: formValue.description,
+        });
+    }
+
+    updateTodo() {
+        this.setState({ loading: true });
+        update_todo(fix_todo_time((this.state as unknown) as TodoData)).then(async (res) => {
+            if (res.status === 200) {
+                download_data(this.state.deadline.getFullYear(), this.state.deadline.getMonth() + 1)
+                    .then(() => {
+                        this.props.toggleEditingTodo();
+                        this.setState({ loading: false });
+                        Notification["success"]({
+                            title: "更新成功",
+                            description: <p>你剛剛更新了一項 Deadline 的資訊</p>,
+                            placement: "bottomStart",
+                        });
+                    })
+                    .catch((err) => {
+                        this.props.toggleEditingTodo();
+                        this.setState({ loading: false });
+                        Notification["error"]({
+                            title: "下載行事曆資料失敗",
+                            description: <p>{err}</p>,
+                            placement: "bottomStart",
+                        });
+                    });
+            }
+        });
+    }
+
+    deleteItem() {
+        this.setState({ removing: true });
+        if (this.props.todo === null) return;
+        delete_item(this.props.todo._id)
+            .then((res) => {
+                if (res.status === 200)
+                    download_data(this.state.deadline.getFullYear(), this.state.deadline.getMonth() + 1)
+                        .then(() => {
+                            if (this.props.todo === null) return;
+                            this.props.deleteTodo(this.props.todo._id);
+                            this.props.toggleEditingTodo();
+                            this.setState({ removing: false });
+                            Notification["success"]({
+                                title: "刪除成功",
+                                description: <p>成功刪除了一項 Deadline</p>,
+                                placement: "bottomStart",
+                            });
+                        })
+                        .catch((err) => {
+                            this.props.toggleEditingTodo();
+                            this.setState({ removing: false });
+                            Notification["error"]({
+                                title: "下載行事曆資料失敗",
+                                description: <p>{err}</p>,
+                                placement: "bottomStart",
+                            });
+                        });
+            })
+            .catch(() => {
+                this.props.toggleEditingTodo();
+                Notification["error"]({
+                    title: "刪除失敗",
+                    description: <p>刪除 DeadLine 時發生了錯誤</p>,
+                    placement: "bottomStart",
+                });
+            });
+    }
+
     render() {
-        if (this.props.inputing === undefined) return null;
+        const selectedTodo = store.getState().systemStateReducer.UI.selectedTodo;
+        if (selectedTodo === null) return null;
 
-        const { titles, descriptions } = getTodosAutoCompleteData(this.props.inputing.calendar);
         return (
-            <Modal show={this.props.editingTodo} aria-labelledby="form-dialog-title" width="xs">
-                <Modal.Header closeButton onClick={this.props.closeTodoEditDialog}>
-                    <Avatar
-                        style={{
-                            backgroundImage:
-                                "linear-gradient(315deg, " +
-                                this.props.selectedTodo.color[0] +
-                                " 0%, " +
-                                this.props.selectedTodo.color[1] +
-                                " 100%)",
-                            color: "#ffffff"
-                        }}
-                    >
-                        {this.props.selectedTodo.calendarTitle.charAt(0)}
-                    </Avatar>
-                    <h5 style={{ marginLeft: 6, display: "inline-block" }}>{this.props.selectedTodo.calendarTitle}</h5>
+            <Modal
+                keyboard
+                show={this.props.editingTodo}
+                aria-labelledby="form-dialog-title"
+                width="xs"
+                onHide={() => this.props.toggleEditingTodo()}
+            >
+                <Modal.Header closeButton>
+                    <h5 style={{ marginLeft: 6, display: "inline-block" }}>{this.state.calendarData.title}</h5>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form formValue={this.props.inputing} onChange={this.props.handleFormChange}>
+                    <Form formValue={this.state} onChange={this.handleInput}>
                         <FormGroup>
                             <ControlLabel>事件標題</ControlLabel>
-                            <FormControl
-                                name="title"
-                                accepter={AutoComplete}
-                                data={titles}
-                                className="DialogFormControl"
-                                autoComplete="off"
-                            />
+                            <FormControl name="title" accepter={AutoComplete} className="DialogFormControl" autoComplete="off" />
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>截止日期</ControlLabel>
-                            <FormControl name="deadLine" accepter={DatePicker} format="YYYY-MM-DD HH:mm" className="DialogFormControl" />
+                            <ControlLabel>Deadline</ControlLabel>
+                            <FormControl
+                                name="deadline"
+                                accepter={DatePicker}
+                                format="YYYY年MM月DD日 HH點mm分"
+                                className="DialogFormControl"
+                                placement="auto"
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>補充敘述</ControlLabel>
-                            <FormControl
-                                name="description"
-                                accepter={AutoComplete}
-                                data={descriptions}
-                                className="DialogFormControl"
-                                autoComplete="off"
-                            />
+                            <FormControl name="description" accepter={AutoComplete} className="DialogFormControl" autoComplete="off" />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>已完成</ControlLabel>
-                            <FormControl
-                                accepter={Toggle}
-                                name="complete"
-                                checked={this.props.inputing.complete}
-                                className="DialogFormControl"
-                            />
+                            <FormControl accepter={Toggle} name="complete" checked={this.state.complete} />
                         </FormGroup>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <FlexboxGrid>
                         <FlexboxGrid.Item colspan={3} style={{ textAlign: "left" }}>
-                            <Button color="red" onClick={this.props.removeTodo} loading={this.props.removing}>
+                            <Button color="red" onClick={this.deleteItem} loading={this.state.removing}>
                                 刪除
                             </Button>
                         </FlexboxGrid.Item>
                         <FlexboxGrid.Item colspan={15} />
                         <FlexboxGrid.Item colspan={6} style={{ textAlign: "right" }}>
-                            <Button onClick={this.props.closeTodoEditDialog}>取消</Button>
-                            <Button appearance="primary" onClick={this.props.updateTodo} loading={this.props.waiting}>
+                            <Button onClick={this.props.toggleEditingTodo}>取消</Button>
+                            <Button appearance="primary" onClick={this.updateTodo} loading={this.state.loading}>
                                 更新
                             </Button>
                         </FlexboxGrid.Item>
@@ -84,4 +195,20 @@ class EditTodoDialog extends React.Component<EditTodoDialogProps> {
     }
 }
 
-export default EditTodoDialog;
+function mapStateToProps(state: AppState) {
+    return {
+        todo: state.systemStateReducer.UI.selectedTodo,
+        editingTodo: state.systemStateReducer.UI.editingTodo,
+    };
+}
+
+function mapDispatchToProps(dispatch: typeof store.dispatch) {
+    return {
+        toggleEditingTodo: () => dispatch(toggleEditingTodo()),
+        deleteTodo: (_id: string) => dispatch(deleteTodo(_id)),
+    };
+}
+
+const VisibleEditTodoDialog = connect(mapStateToProps, mapDispatchToProps)(EditTodoDialog);
+
+export default VisibleEditTodoDialog;

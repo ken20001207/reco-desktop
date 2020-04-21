@@ -1,51 +1,10 @@
-import { Notification } from "rsuite";
-import { Event, Calendar, Repeat, User, Todo } from "./classes";
-import { apiURL } from "./config";
 import React from "react";
-
-/** 更新使用者資料 */
-export function updateUserData(data: User) {
-    return fetch(apiURL + "/update", {
-        method: "POST",
-        body: JSON.stringify(data)
-    });
-}
-
-/** 取得使用者資料 */
-export function getUserData(id: string) {
-    return new Promise((resolve, reject) => {
-        fetch(apiURL + "/userdata/" + id)
-            .then(response => response.json())
-            .then(response => {
-                resolve(response);
-            })
-            .catch(err => {
-                reject(err);
-            });
-        return null;
-    });
-}
-
-/** 產生一組 UUID 給任意物件使用 */
-export function generateUUID() {
-    var d = Date.now();
-    if (typeof performance !== "undefined" && typeof performance.now === "function") {
-        d += performance.now();
-    }
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-    });
-}
+import { EventData } from "../types";
 
 /** 建構事件彈窗資訊
  * Compose EvnetCrad Popover Content */
-export function getEventPopoverContent(event: Event) {
+export function getEventPopoverContent(event: EventData) {
     var popoverContent = [];
-
-    // Calendar Title
-    popoverContent.push(<p key="ct">{event.calendarTitle}</p>);
 
     // Evnet Title
     popoverContent.push(
@@ -55,7 +14,7 @@ export function getEventPopoverContent(event: Event) {
                 color: "white",
                 fontSize: 18,
                 fontWeight: 3000,
-                lineHeight: 1.5
+                lineHeight: 1.5,
             }}
         >
             {event.title}
@@ -71,7 +30,7 @@ export function getEventPopoverContent(event: Event) {
         );
 
     // Duration
-    if (!event.isAllDayEvent()) popoverContent.push(<p>{event.getDurationString()}</p>);
+    if (!event.isAllDayEvent()) popoverContent.push(<p key="ds">{event.getDurationString()}</p>);
 
     // Location
     if (event.location !== "")
@@ -94,7 +53,7 @@ export function getEventPopoverContent(event: Event) {
 
 /** 用卡片高度計算卡片要顯示幾行資訊
  * Calculate the line Amount of Event Card Info */
-export function getLineAmount(event: Event, height: number) {
+export function getLineAmount(event: EventData, height: number) {
     return height >= 0
         ? Math.floor(height / 20) > 1
             ? Math.floor(height / 20) - 1
@@ -106,7 +65,7 @@ export function getLineAmount(event: Event, height: number) {
 
 /** 建構事件卡片資訊
  * Compose Info in EvnetCrad */
-export function getEventCardInfo(event: Event) {
+export function getEventCardInfo(event: EventData) {
     var eventInfo = [];
 
     // 標題與時間
@@ -122,7 +81,7 @@ export function getEventCardInfo(event: Event) {
                     style={{
                         marginLeft: 16,
                         color: "rgba(255,255,255,0.4)",
-                        fontSize: 12
+                        fontSize: 12,
                     }}
                 >
                     {event.getDurationString()}
@@ -155,112 +114,17 @@ export function getEventCardInfo(event: Event) {
             </p>
         );
 
-    // 行事曆標題
-    eventInfo.push(
-        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: "bold" }} key="cal">
-            {event.calendarTitle}
-        </p>
-    );
     return eventInfo;
 }
 
-/**
- * 將時間物件和今天日期比對來返回中文的時間敘述.
- *
- * @param {Date} date 想要拿來和今天比較的日期.
- */
-export function getDayDescription(date: Date) {
-    var dayDescription = "";
-    var DayA = new Date(date);
-    var DayB = new Date();
-    DayA.setHours(12, 0, 0);
-    DayB.setHours(12, 0, 0);
-    if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) < 0) {
-        if (DayA.getFullYear() === DayB.getFullYear() && DayA.getMonth() === DayB.getMonth() && DayA.getDate() === DayB.getDate())
-            dayDescription = "今天";
-        else if (DayA.getFullYear() === DayB.getFullYear() && DayA.getMonth() === DayB.getMonth() && DayA.getDate() + 1 === DayB.getDate())
-            dayDescription = "昨天";
-        else if (DayA.getFullYear() === DayB.getFullYear() && DayA.getMonth() === DayB.getMonth() && DayA.getDate() + 2 === DayB.getDate())
-            dayDescription = "前天";
-        else dayDescription = Math.floor((DayA.getTime() - DayB.getTime()) / 3600000 / -24) + " 天前";
-    } else {
-        if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 0) dayDescription = "今天";
-        else if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 23) dayDescription = "明天";
-        else if (Math.floor((DayA.getTime() - DayB.getTime()) / 3600000) === 47) dayDescription = "後天";
-        else dayDescription = Math.floor((DayA.getTime() - DayB.getTime()) / 3600000 / 24) + 1 + " 天後";
-    }
-    return dayDescription;
-}
-
-/** 顯示錯誤訊息 */
-export function displayError(title: string, message: string) {
-    Notification["error"]({
-        title: title,
-        description: message
-    });
-}
-
-/** 返回特定日期的 0 點 0 分 */
-export function startOfDay(date: Date) {
-    var time = new Date();
-    time.setTime(date.getTime());
-    time.setHours(0, 0, 0);
-    return time;
-}
-
-/** 返回特定日期的 23 點 59 分 */
-export function endOfDay(date: Date) {
-    var time = new Date();
-    time.setTime(date.getTime());
-    time.setHours(23, 59, 59);
-    return time;
-}
-
-/** 透過參數建立新 Event */
-export function createEvent(
-    name: string,
-    color: Array<string>,
-    startTime: Date,
-    endTime: Date,
-    repeatID: string,
-    ignore: boolean = false,
-    isEmpty: boolean = false,
-    description: string = "",
-    location: string = "",
-    calendarTitle: string
-) {
-    var newEvent = new Event();
-    newEvent.title = name;
-    newEvent.color = color;
-    newEvent.startTime = startTime;
-    newEvent.endTime = endTime;
-    newEvent.ignore = ignore;
-    newEvent.isEmpty = isEmpty;
-    newEvent.repeatID = repeatID;
-    newEvent.description = description;
-    newEvent.location = location;
-    newEvent.calendarTitle = calendarTitle;
-    return newEvent;
-}
-
-/** 透過參數建立新 Todo */
-export function createTodo(name: string, color: Array<string>, description: string = "", calendarTitle: string, deadLine: Date) {
-    var newTodo = new Todo();
-    newTodo.name = name;
-    newTodo.color = color;
-    newTodo.DeadLine = deadLine;
-    newTodo.description = description;
-    newTodo.calendarTitle = calendarTitle;
-    return newTodo;
-}
-
+/*
 export function buildRepeatToEvent(userdata: User, date: Date) {
-    return new Promise<{ data: User; changed: boolean }>(resolve => {
+    return new Promise<{ data: User; changed: boolean }>((resolve) => {
         date.setHours(12, 0);
         var changed = false;
         var newdata = new User(userdata);
-        newdata.calendars.map(calendar => {
-            calendar.repeats.map(repeat => {
+        newdata.calendars.map((calendar) => {
+            calendar.repeats.map((repeat) => {
                 repeat = new Repeat(repeat);
                 repeat.startDate.setHours(12, 0);
                 repeat.endDate.setHours(12, 0);
@@ -303,80 +167,4 @@ export function buildRepeatToEvent(userdata: User, date: Date) {
         });
         resolve({ data: newdata, changed: changed });
     });
-}
-
-/** 從傳入的 Calendar Array 過濾出特定日期的 Event */
-export function eventsToDispay(calendars: Array<Calendar>, date: Date) {
-    var eventsToDispay: Array<Event> = [];
-    calendars.map(calendar => {
-        calendar.events.map(event => {
-            event = new Event(event);
-            if (
-                event.startTime.getFullYear() === date.getFullYear() &&
-                event.startTime.getMonth() === date.getMonth() &&
-                event.startTime.getDate() === date.getDate() &&
-                !event.isAllDayEvent()
-            ) {
-                eventsToDispay.push(event);
-            }
-
-            return null;
-        });
-
-        return null;
-    });
-    eventsToDispay.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
-    return eventsToDispay;
-}
-
-/** 從傳入的 Calendar Array 過濾出特定日期的 All Day Event (全天事件) */
-export function allDayEventsToDispay(calendars: Array<Calendar>, date: Date) {
-    var allDayEventsToDispay: Array<Event> = [];
-    calendars.map(calendar => {
-        calendar.events.map(event => {
-            event = new Event(event);
-            if (
-                event.startTime.getFullYear() === date.getFullYear() &&
-                event.startTime.getMonth() === date.getMonth() &&
-                event.startTime.getDate() === date.getDate() &&
-                event.isAllDayEvent()
-            ) {
-                allDayEventsToDispay.push(event);
-            }
-            return null;
-        });
-
-        return null;
-    });
-    return allDayEventsToDispay;
-}
-
-export function todosToDisplay(calendars: Array<Calendar>, date: Date) {
-    var todosToDisplay: Array<Todo> = [];
-    calendars.map(calendar => {
-        calendar.todos.map(todo => {
-            todo = new Todo(todo);
-            if (
-                todo.DeadLine.getFullYear() === date.getFullYear() &&
-                todo.DeadLine.getMonth() === date.getMonth() &&
-                todo.DeadLine.getDate() >= date.getDate() &&
-                todo.DeadLine.getDate() <= date.getDate() + 3 &&
-                !todo.complete
-            ) {
-                todosToDisplay.push(todo);
-            }
-            if (
-                todo.DeadLine.getFullYear() === date.getFullYear() &&
-                todo.DeadLine.getMonth() === date.getMonth() &&
-                todo.DeadLine.getDate() === date.getDate() &&
-                todo.complete
-            ) {
-                todosToDisplay.push(todo);
-            }
-            return null;
-        });
-
-        return null;
-    });
-    return todosToDisplay;
-}
+}*/

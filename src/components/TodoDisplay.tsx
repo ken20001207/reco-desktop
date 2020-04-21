@@ -1,30 +1,65 @@
 import React from "react";
 
-import { todoDisplayProps } from "../utils/interfaces";
 import TodoCard from "./TodoCard";
+import { store } from "../redux/store";
+import { toggleCreatingTodo } from "../redux/actions";
+import { connect } from "react-redux";
+import { Panel, Icon } from "rsuite";
+import { TodoData, AppState } from "../types";
 
-export default class TodoDisplay extends React.Component<todoDisplayProps> {
+interface todoDisplayProps {
+    todos: Array<TodoData>;
+    displayDate: Date;
+    container: React.RefObject<HTMLDivElement>;
+    toggleCreatingTodo: () => void;
+}
+
+class TodoDisplay extends React.Component<todoDisplayProps> {
     render() {
-        if (this.props.todos.length === 0) return null;
-
-        var todos = this.props.todos.map(todo => {
+        var display_todos = this.props.todos.filter((todo) => {
             return (
-                <TodoCard
-                    position={undefined}
-                    container={this.props.container}
-                    key={todo.id}
-                    height={60}
-                    todo={todo}
-                    openTodoEditDialog={this.props.openTodoEditDialog}
-                    openTodoCreateDialog={this.props.openTodoCreateDialog}
-                />
+                (todo.deadline.getTime() - this.props.displayDate.getTime()) / 86400000 < 3 &&
+                todo.deadline.getTime() - this.props.displayDate.getTime() > 0
             );
+        });
+        display_todos.sort((todoA, todoB) => (todoA.complete ? 1 : 0) - (todoB.complete ? 1 : 0));
+        var todos = display_todos.map((todo) => {
+            return <TodoCard position={undefined} container={this.props.container} key={todo._id} height={60} todo={todo} />;
         });
 
         return (
             <div style={{ marginTop: 30 }}>
-                <h5>需注意</h5> {todos}
+                <h5>DeadLines</h5> {todos}
+                <Panel
+                    style={{
+                        height: 60,
+                        fontSize: 8,
+                        paddingLeft: 0,
+                        paddingTop: 0,
+                        marginTop: 16,
+                        paddingBottom: 6,
+                        width: "100%",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                    onClick={() => this.props.toggleCreatingTodo()}
+                >
+                    <Icon icon="plus" />
+                </Panel>
             </div>
         );
     }
 }
+
+function mapStateToProps(state: AppState) {
+    return {
+        todos: state.systemStateReducer.todos,
+    };
+}
+
+function mapDispatchToProps(dispatch: typeof store.dispatch) {
+    return { toggleCreatingTodo: () => dispatch(toggleCreatingTodo()) };
+}
+
+const VisibleTodoDisplay = connect(mapStateToProps, mapDispatchToProps)(TodoDisplay);
+
+export default VisibleTodoDisplay;

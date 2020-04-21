@@ -1,24 +1,22 @@
 import React from "react";
-import EventCard from "./eventCard";
+import EventCard from "./EventCard";
+import { store } from "../redux/store";
+import sameday from "../utils/sameday";
 
-import { AllDayEventsProps } from "../utils/interfaces";
+export interface AllDayEventsProps {
+    container: React.RefObject<HTMLDivElement>;
+    displayDate: Date;
+}
 
 class AllDayEvents extends React.Component<AllDayEventsProps> {
     render() {
-        var events = this.props.events.map(event => {
-            return (
-                <EventCard
-                    position={undefined}
-                    container={this.props.container}
-                    key={event.id}
-                    height={60}
-                    event={event}
-                    openEventEditDialog={this.props.openEventEditDialog}
-                    openEventCreateDialog={this.props.openEventCreateDialog}
-                />
-            );
-        });
-        return events ;
+        var events = store
+            .getState()
+            .systemStateReducer.events.filter((event) => sameday(event.startTime, this.props.displayDate) && event.isAllDayEvent())
+            .map((event) => {
+                return <EventCard position={undefined} container={this.props.container} key={event._id} height={60} event={event} />;
+            });
+        return events;
     }
 }
 

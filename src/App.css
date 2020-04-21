@@ -53,9 +53,8 @@
 }
 
 .day-view-scroll {
+    height: 50vh;
     overflow-y: scroll;
-    height: 45vh;
-    position: relative;
     margin-top: 32px;
     padding: 8px;
 }
@@ -81,6 +80,10 @@
     font-size: 24px;
     font-weight: bolder;
     margin-bottom: 8x;
+}
+
+.DayPicker-Month {
+    margin: 0px !important;
 }
 
 .day-info > p {
@@ -131,7 +134,7 @@ textarea,
 
 body {
     margin: 0;
-    background-color: #2a2c31;
+    background-color: rgba(26, 26, 26, 1);
 }
 ::-webkit-scrollbar {
     width: 0px;
@@ -344,7 +347,8 @@ body {
     background-color: #51a0fa;
 }
 
-.DayPicker:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
+.DayPicker:not(.DayPicker--interactionDisabled)
+    .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
     background-color: #f0f8ff;
 }
 
