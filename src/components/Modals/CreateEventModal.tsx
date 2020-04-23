@@ -15,18 +15,18 @@ import {
     Input,
 } from "rsuite";
 import { ItemDataType } from "rsuite/lib/@types/common";
-import { store } from "../redux/store";
-import { CalendarData, AppState, EventData } from "../types";
+import { store } from "../../redux/store";
+import { CalendarData, AppState, EventData } from "../../types";
 import { connect } from "react-redux";
-import { toggleCreatingEvent } from "../redux/actions";
-import update_event from "../utils/update_event";
-import { fix_event_time } from "../utils/fix_time";
-import download_data from "../utils/download_datas";
+import { toggleCreatingEvent } from "../../redux/actions";
+import update_event from "../../utils/update_event";
+import { fix_event_time } from "../../utils/fix_time";
+import download_data from "../../utils/download_datas";
 
-import generateUUID from "../utils/generateUUID";
-import get_calendar_menu_item from "./calendar_menu_item";
-import get_calendar_menu_value from "./calendar_menu_value";
-import { send_success_message, send_error_message } from "./send_message";
+import generateUUID from "../../utils/generateUUID";
+import get_calendar_menu_item from "../calendar_menu_item";
+import get_calendar_menu_value from "../calendar_menu_value";
+import { send_success_message, send_error_message } from "../send_message";
 
 interface Props {
     CreatingEvent: boolean;
@@ -50,7 +50,7 @@ interface States {
     repeatID: string;
 }
 
-class CreateEventDialog extends React.Component<Props, States> {
+class CreateEventModal extends React.Component<Props, States> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -128,7 +128,7 @@ class CreateEventDialog extends React.Component<Props, States> {
                             name="startTime"
                             accepter={DatePicker}
                             format="YYYY年MM月DD日 HH點mm分"
-                            placement="rightEnd"
+                            placement="auto"
                         />
                     </FormGroup>
                     <FormGroup>
@@ -138,7 +138,7 @@ class CreateEventDialog extends React.Component<Props, States> {
                             name="endTime"
                             accepter={DatePicker}
                             format="YYYY年MM月DD日 HH點mm分"
-                            placement="rightEnd"
+                            placement="auto"
                             disabledDate={(date: Date | undefined) => (date ? date.getTime() < this.state.startTime.getTime() : false)}
                         />
                     </FormGroup>
@@ -245,6 +245,6 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return { toggleCreatingEvent: () => dispatch(toggleCreatingEvent()) };
 }
 
-const VisibleCreateEventDialog = connect(mapStateToProps, mapDispatchToProps)(CreateEventDialog);
+const VisibleCreateEventModal = connect(mapStateToProps, mapDispatchToProps)(CreateEventModal);
 
-export default VisibleCreateEventDialog;
+export default VisibleCreateEventModal;

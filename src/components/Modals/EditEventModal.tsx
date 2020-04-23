@@ -1,15 +1,15 @@
 import React from "react";
 import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete, Input } from "rsuite";
-import { store } from "../redux/store";
-import { toggleEditingEvent, deleteEvent } from "../redux/actions";
+import { store } from "../../redux/store";
+import { toggleEditingEvent, deleteEvent } from "../../redux/actions";
 import { connect } from "react-redux";
-import { AppState, EventData } from "../types";
-import update_event from "../utils/update_event";
-import { fix_event_time } from "../utils/fix_time";
-import download_data from "../utils/download_datas";
+import { AppState, EventData } from "../../types";
+import update_event from "../../utils/update_event";
+import { fix_event_time } from "../../utils/fix_time";
+import download_data from "../../utils/download_datas";
 
-import delete_item from "../utils/delete_item";
-import { send_success_message, send_error_message } from "./send_message";
+import delete_item from "../../utils/delete_item";
+import { send_success_message, send_error_message } from "../send_message";
 
 interface Props {
     event: EventData | null;
@@ -36,7 +36,7 @@ interface State {
     repeatID: string;
 }
 
-class EditEventDialog extends React.Component<Props, State> {
+class EditEventModal extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.handleInput = this.handleInput.bind(this);
@@ -146,7 +146,7 @@ class EditEventDialog extends React.Component<Props, State> {
                                 name="startTime"
                                 accepter={DatePicker}
                                 format="YYYY年MM月DD日 HH點mm分"
-                                placement="rightEnd"
+                                placement="auto"
                             />
                         </FormGroup>
                         <FormGroup>
@@ -156,7 +156,7 @@ class EditEventDialog extends React.Component<Props, State> {
                                 name="endTime"
                                 accepter={DatePicker}
                                 format="YYYY年MM月DD日 HH點mm分"
-                                placement="rightEnd"
+                                placement="auto"
                                 disabledDate={(date: Date | undefined) => (date ? date.getTime() < this.state.startTime.getTime() : false)}
                             />
                         </FormGroup>
@@ -249,6 +249,6 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     };
 }
 
-const VisibleEditEventDialog = connect(mapStateToProps, mapDispatchToProps)(EditEventDialog);
+const VisibleEditEventModal = connect(mapStateToProps, mapDispatchToProps)(EditEventModal);
 
-export default VisibleEditEventDialog;
+export default VisibleEditEventModal;

@@ -1,14 +1,14 @@
 import React from "react";
 import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete, Input } from "rsuite";
-import { store } from "../redux/store";
-import { AppState, TodoData, CalendarData } from "../types";
+import { store } from "../../redux/store";
+import { AppState, TodoData, CalendarData } from "../../types";
 import { connect } from "react-redux";
-import { toggleEditingTodo, deleteTodo } from "../redux/actions";
-import update_todo from "../utils/update_todo";
-import { fix_todo_time } from "../utils/fix_time";
-import download_data from "../utils/download_datas";
-import delete_item from "../utils/delete_item";
-import { send_success_message, send_error_message } from "./send_message";
+import { toggleEditingTodo, deleteTodo } from "../../redux/actions";
+import update_todo from "../../utils/update_todo";
+import { fix_todo_time } from "../../utils/fix_time";
+import download_data from "../../utils/download_datas";
+import delete_item from "../../utils/delete_item";
+import { send_success_message, send_error_message } from "../send_message";
 
 interface Props {
     todo: TodoData | null;
@@ -30,7 +30,7 @@ interface States {
     description: string;
 }
 
-class EditTodoDialog extends React.Component<Props, States> {
+class EditTodoModal extends React.Component<Props, States> {
     constructor(props: Props) {
         super(props);
         this.handleInput = this.handleInput.bind(this);
@@ -194,6 +194,6 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     };
 }
 
-const VisibleEditTodoDialog = connect(mapStateToProps, mapDispatchToProps)(EditTodoDialog);
+const VisibleEditTodoModal = connect(mapStateToProps, mapDispatchToProps)(EditTodoModal);
 
-export default VisibleEditTodoDialog;
+export default VisibleEditTodoModal;

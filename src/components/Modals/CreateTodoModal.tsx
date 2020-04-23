@@ -14,17 +14,17 @@ import {
     Input,
 } from "rsuite";
 import { ItemDataType } from "rsuite/lib/@types/common";
-import { CalendarData, AppState, TodoData } from "../types";
-import { store } from "../redux/store";
-import { toggleCreatingTodo } from "../redux/actions";
+import { CalendarData, AppState, TodoData } from "../../types";
+import { store } from "../../redux/store";
+import { toggleCreatingTodo } from "../../redux/actions";
 import { connect } from "react-redux";
-import { fix_todo_time } from "../utils/fix_time";
-import update_todo from "../utils/update_todo";
-import download_data from "../utils/download_datas";
-import generateUUID from "../utils/generateUUID";
-import get_calendar_menu_item from "./calendar_menu_item";
-import get_calendar_menu_value from "./calendar_menu_value";
-import { send_success_message, send_error_message } from "./send_message";
+import { fix_todo_time } from "../../utils/fix_time";
+import update_todo from "../../utils/update_todo";
+import download_data from "../../utils/download_datas";
+import generateUUID from "../../utils/generateUUID";
+import get_calendar_menu_item from "../calendar_menu_item";
+import get_calendar_menu_value from "../calendar_menu_value";
+import { send_success_message, send_error_message } from "../send_message";
 
 interface Props {
     creatingTodo: boolean;
@@ -43,7 +43,7 @@ interface States {
     description: string;
 }
 
-class CreateTodoDialog extends React.Component<Props, States> {
+class CreateTodoModal extends React.Component<Props, States> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -147,7 +147,7 @@ class CreateTodoDialog extends React.Component<Props, States> {
                                 accepter={DatePicker}
                                 format="YYYY-MM-DD HH:mm"
                                 className="DialogFormControl"
-                                placement="rightEnd"
+                                placement="auto"
                             />
                         </FormGroup>
                         <FormGroup>
@@ -189,6 +189,6 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return { toggleCreatingTodo: () => dispatch(toggleCreatingTodo()) };
 }
 
-const VisibleCreateTodoDialog = connect(mapStateToProps, mapDispatchToProps)(CreateTodoDialog);
+const VisibleCreateTodoModal = connect(mapStateToProps, mapDispatchToProps)(CreateTodoModal);
 
-export default VisibleCreateTodoDialog;
+export default VisibleCreateTodoModal;

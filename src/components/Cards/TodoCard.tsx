@@ -1,11 +1,11 @@
 import React, { CSSProperties } from "react";
 
 import { Panel } from "rsuite";
-import { TodoData } from "../types";
-import { store } from "../redux/store";
-import { toggleEditingTodo, selectTodo } from "../redux/actions";
+import { TodoData } from "../../types";
+import { store } from "../../redux/store";
+import { toggleEditingTodo, selectTodo } from "../../redux/actions";
 import { connect } from "react-redux";
-import { getDayDescription } from "../utils/getDayDescription";
+import { getDayDescription } from "../../utils/getDayDescription";
 
 interface TodoCardProps {
     position: number | undefined;

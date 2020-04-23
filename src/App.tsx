@@ -1,22 +1,22 @@
 import React from "react";
 import DayPicker from "react-day-picker";
 
-import DayView from "./components/DayView";
-import AllDayEvents from "./components/AllDayEvents";
-import TodoDisplay from "./components/TodoDisplay";
-import EditEventDialog from "./components/EditEventDialog";
-import CreateEventDialog from "./components/CreateEventDialog";
+import DayView from "./components/Views/DayView";
+import AllDayEvents from "./components/Views/AllDayEvents";
+import TodoDisplay from "./components/Views/TodoDisplay";
+import EditEventDialog from "./components/Modals/EditEventModal";
+import CreateEventDialog from "./components/Modals/CreateEventModal";
 
 import { Loader, Row, Grid } from "rsuite";
 import "rsuite/dist/styles/rsuite-dark.css";
 import "./App.css";
 import "./style/style.css";
-import CreateTodoDialog from "./components/CreateTodoDialog";
-import EditTodoDialog from "./components/EditTodoDialog";
+import CreateTodoDialog from "./components/Modals/CreateTodoModal";
+import EditTodoDialog from "./components/Modals/EditTodoModal";
 import check_session from "./utils/check_session";
 import { store } from "./redux/store";
 import { updateUser, updateCalendar } from "./redux/actions";
-import { UserData, CalendarData, SystemState } from "./types";
+import { UserData, CalendarData } from "./types";
 import download_data from "./utils/download_datas";
 import { getDayDescription } from "./utils/getDayDescription";
 import { send_success_message, send_info_message } from "./components/send_message";
@@ -27,9 +27,7 @@ interface IndexStates {
     screenHeight: number;
 }
 
-interface Props {
-    store: SystemState;
-}
+interface Props {}
 
 class index extends React.Component<Props, IndexStates> {
     dayviewContainer: React.RefObject<HTMLDivElement>;

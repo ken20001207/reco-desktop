@@ -1,7 +1,7 @@
 import React from "react";
-import EventCard from "./EventCard";
-import { store } from "../redux/store";
-import sameday from "../utils/sameday";
+import EventCard from "../Cards/EventCard";
+import { store } from "../../redux/store";
+import sameday from "../../utils/sameday";
 
 export interface AllDayEventsProps {
     container: React.RefObject<HTMLDivElement>;

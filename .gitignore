@@ -1,6 +1,12 @@
+# node modules
 node_modules
+
+# react build files
 build
-.DS_Store
+
+# release files
+dist
+
+# lock files
 package-lock.json
 yarn.lock
-./electron.js

@@ -1,12 +1,12 @@
 import React from "react";
 
-import TodoCard from "./TodoCard";
-import { store } from "../redux/store";
-import { toggleCreatingTodo } from "../redux/actions";
+import TodoCard from "../Cards/TodoCard";
+import { store } from "../../redux/store";
+import { toggleCreatingTodo } from "../../redux/actions";
 import { connect } from "react-redux";
 import { Panel, Icon } from "rsuite";
-import { TodoData, AppState } from "../types";
-import get_day_diff from "../utils/get_day_diff";
+import { TodoData, AppState } from "../../types";
+import get_day_diff from "../../utils/get_day_diff";
 
 interface todoDisplayProps {
     todos: Array<TodoData>;

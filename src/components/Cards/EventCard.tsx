@@ -1,10 +1,10 @@
 import React, { CSSProperties } from "react";
-import { getEventPopoverContent, getLineAmount, getEventCardInfo } from "../utils/methods";
+import { getEventPopoverContent, getLineAmount, getEventCardInfo } from "../../utils/methods";
 
 import { FlexboxGrid, Whisper, Popover, Panel } from "rsuite";
-import { store } from "../redux/store";
-import { selectEvent, toggleEditingEvent } from "../redux/actions";
-import { EventData } from "../types";
+import { store } from "../../redux/store";
+import { selectEvent, toggleEditingEvent } from "../../redux/actions";
+import { EventData } from "../../types";
 import { connect } from "react-redux";
 
 export interface EventCardProps {

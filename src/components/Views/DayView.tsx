@@ -1,11 +1,11 @@
 import React, { createRef } from "react";
 import { Panel, Divider } from "rsuite";
-import sameday from "../utils/sameday";
-import { store } from "../redux/store";
-import { toggleCreatingEvent } from "../redux/actions";
-import { EventData, SystemState, AppState } from "../types";
+import sameday from "../../utils/sameday";
+import { store } from "../../redux/store";
+import { toggleCreatingEvent } from "../../redux/actions";
+import { EventData, SystemState, AppState } from "../../types";
 import { connect } from "react-redux";
-import EventCard from "./EventCard";
+import EventCard from "../Cards/EventCard";
 
 interface Props {
     store: SystemState;
