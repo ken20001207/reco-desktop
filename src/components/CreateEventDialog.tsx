@@ -12,6 +12,7 @@ import {
     Toggle,
     DatePicker,
     AutoComplete,
+    Input,
 } from "rsuite";
 import { ItemDataType } from "rsuite/lib/@types/common";
 import { store } from "../redux/store";
@@ -24,6 +25,8 @@ import download_data from "../utils/download_datas";
 
 import { Notification } from "rsuite";
 import { generateUUID } from "../utils/generateUUID";
+import get_calendar_menu_item from "./calendar_menu_item";
+import get_calendar_menu_value from "./calendar_menu_value";
 
 interface Props {
     CreatingEvent: boolean;
@@ -68,6 +71,10 @@ class CreateEventDialog extends React.Component<Props, States> {
         };
         this.handleInput = this.handleInput.bind(this);
         this.createEvent = this.createEvent.bind(this);
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ calendarData: store.getState().systemStateReducer.calendars[0] });
     }
 
     handleInput(formValue: any) {
@@ -117,6 +124,7 @@ class CreateEventDialog extends React.Component<Props, States> {
     }
 
     render() {
+        /** 時間選項 */
         var time = <p />;
         if (!this.state.allDay)
             time = (
@@ -139,10 +147,20 @@ class CreateEventDialog extends React.Component<Props, States> {
                             accepter={DatePicker}
                             format="YYYY年MM月DD日 HH點mm分"
                             placement="rightEnd"
+                            disabledDate={(date: Date | undefined) => (date ? date.getTime() < this.state.startTime.getTime() : false)}
                         />
                     </FormGroup>
                 </FormGroup>
             );
+        else
+            time = (
+                <FormGroup>
+                    <ControlLabel>日期</ControlLabel>
+                    <FormControl className="DialogFormControl" name="startTime" accepter={DatePicker} format="YYYY年MM月DD日" oneTap />
+                </FormGroup>
+            );
+
+        /** Calender 選項 */
         var calendarOptions: Array<{ label: string; value: CalendarData }> = [];
         if (store.getState().systemStateReducer.calendars !== undefined) {
             calendarOptions = store.getState().systemStateReducer.calendars.map((calendar) => {
@@ -159,103 +177,67 @@ class CreateEventDialog extends React.Component<Props, States> {
                 width="xs"
                 onHide={this.props.toggleCreatingEvent}
             >
-                <Modal.Header closeButton>
-                    <h5>創建新事件</h5>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form formValue={this.state} onChange={this.handleInput}>
+                <Form formValue={this.state} onChange={this.handleInput}>
+                    <Modal.Header closeButton>
+                        <h5>創建新事件</h5>
+                    </Modal.Header>
+                    <Modal.Body>
                         <FormGroup>
-                            <ControlLabel>行事曆</ControlLabel>
                             <FormControl
                                 name="calendarData"
                                 data={calendarOptions}
                                 defaultValue={this.state.calendar}
-                                style={{ width: 180, height: 60 }}
                                 appearance="subtle"
+                                searchable={false}
+                                cleanable={false}
                                 accepter={SelectPicker}
-                                renderMenuItem={(label: ReactNode, item: ItemDataType) => {
-                                    return (
-                                        <div
-                                            style={{
-                                                backgroundImage:
-                                                    "linear-gradient(315deg, " +
-                                                    item.value.color[0] +
-                                                    " 0%, " +
-                                                    item.value.color[1] +
-                                                    " 100%)",
-                                                padding: 8,
-                                                borderRadius: 8,
-                                                color: "white",
-                                            }}
-                                        >
-                                            <p style={{ fontWeight: "bolder" }}>{label}</p>
-                                        </div>
-                                    );
-                                }}
-                                renderValue={(value: CalendarData, item: any) => {
-                                    return (
-                                        <div
-                                            style={{
-                                                backgroundImage:
-                                                    "linear-gradient(315deg, " +
-                                                    item.value.color[0] +
-                                                    " 0%, " +
-                                                    item.value.color[1] +
-                                                    " 100%)",
-                                                padding: 8,
-                                                borderRadius: 8,
-                                                color: "white",
-                                            }}
-                                        >
-                                            <p style={{ fontWeight: "bolder" }}>{value.title}</p>
-                                        </div>
-                                    );
-                                }}
+                                renderMenuItem={(label: ReactNode, item: ItemDataType) => get_calendar_menu_item(label, item)}
+                                renderValue={(value: CalendarData, item: any) => get_calendar_menu_value(value, item)}
                             />
-                        </FormGroup>
-                        <FormGroup>
-                            <ControlLabel>事件標題</ControlLabel>
-                            <FormControl className="DialogFormControl" name="title" accepter={AutoComplete} autoComplete="off" />
-                        </FormGroup>
-                        <FormGroup>
-                            <ControlLabel>日期</ControlLabel>
                             <FormControl
                                 className="DialogFormControl"
-                                name="startTime"
-                                accepter={DatePicker}
-                                format="YYYY年MM月DD日"
-                                oneTap
+                                placeholder="事件標題"
+                                name="title"
+                                accepter={AutoComplete}
+                                autoComplete="off"
                             />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>全天事件</ControlLabel>
-                            <FormControl accepter={Toggle} name="allday" />
+                            <FormControl accepter={Toggle} name="allDay" />
                         </FormGroup>
                         {time}
                         <FormGroup>
-                            <ControlLabel>詳細敘述</ControlLabel>
-                            <FormControl className="DialogFormControl" name="description" accepter={AutoComplete} autoComplete="off" />
+                            <ControlLabel>註記</ControlLabel>
+                            <FormControl
+                                className="DialogFormControl"
+                                name="description"
+                                accepter={Input}
+                                componentClass="textarea"
+                                rows={3}
+                                autoComplete="off"
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>地點</ControlLabel>
                             <FormControl className="DialogFormControl" name="location" accepter={AutoComplete} autoComplete="off" />
                         </FormGroup>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <FlexboxGrid>
-                        <FlexboxGrid.Item colspan={3} style={{ textAlign: "left" }}>
-                            <Button color="violet">創建系列</Button>
-                        </FlexboxGrid.Item>
-                        <FlexboxGrid.Item colspan={15} />
-                        <FlexboxGrid.Item colspan={6} style={{ textAlign: "right" }}>
-                            <Button onClick={this.props.toggleCreatingEvent}>取消</Button>
-                            <Button appearance="primary" onClick={this.createEvent} loading={this.state.loading}>
-                                創立
-                            </Button>
-                        </FlexboxGrid.Item>
-                    </FlexboxGrid>
-                </Modal.Footer>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <FlexboxGrid>
+                            <FlexboxGrid.Item colspan={3} style={{ textAlign: "left" }}>
+                                <Button color="violet">創建系列</Button>
+                            </FlexboxGrid.Item>
+                            <FlexboxGrid.Item colspan={15} />
+                            <FlexboxGrid.Item colspan={6} style={{ textAlign: "right" }}>
+                                <Button onClick={this.props.toggleCreatingEvent}>取消</Button>
+                                <Button appearance="primary" onClick={this.createEvent} loading={this.state.loading}>
+                                    創立
+                                </Button>
+                            </FlexboxGrid.Item>
+                        </FlexboxGrid>
+                    </Modal.Footer>
+                </Form>
             </Modal>
         );
     }

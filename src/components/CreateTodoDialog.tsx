@@ -1,6 +1,18 @@
 import React, { ReactNode } from "react";
 
-import { FlexboxGrid, Button, Form, FormGroup, FormControl, ControlLabel, SelectPicker, Modal, DatePicker, AutoComplete } from "rsuite";
+import {
+    FlexboxGrid,
+    Button,
+    Form,
+    FormGroup,
+    FormControl,
+    ControlLabel,
+    SelectPicker,
+    Modal,
+    DatePicker,
+    AutoComplete,
+    Input,
+} from "rsuite";
 import { ItemDataType } from "rsuite/lib/@types/common";
 import { CalendarData, AppState, TodoData } from "../types";
 import { store } from "../redux/store";
@@ -11,6 +23,8 @@ import update_todo from "../utils/update_todo";
 import download_data from "../utils/download_datas";
 import { Notification } from "rsuite";
 import { generateUUID } from "../utils/generateUUID";
+import get_calendar_menu_item from "./calendar_menu_item";
+import get_calendar_menu_value from "./calendar_menu_value";
 
 interface Props {
     creatingTodo: boolean;
@@ -56,6 +70,10 @@ class CreateTodoDialog extends React.Component<Props, States> {
             complete: formValue.complete,
             description: formValue.description,
         });
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ calendarData: store.getState().systemStateReducer.calendars[0] });
     }
 
     createTodo() {
@@ -111,56 +129,24 @@ class CreateTodoDialog extends React.Component<Props, States> {
                 <Modal.Body>
                     <Form formValue={this.state} onChange={this.handleInput}>
                         <FormGroup>
-                            <ControlLabel>行事曆</ControlLabel>
                             <FormControl
                                 name="calendarData"
                                 data={calendarOptions}
-                                style={{ width: 180, height: 60 }}
+                                defaultValue={this.state.calendar}
                                 appearance="subtle"
+                                searchable={false}
+                                cleanable={false}
                                 accepter={SelectPicker}
-                                renderMenuItem={(label: ReactNode, item: ItemDataType) => {
-                                    return (
-                                        <div
-                                            style={{
-                                                backgroundImage:
-                                                    "linear-gradient(315deg, " +
-                                                    item.value.color[0] +
-                                                    " 0%, " +
-                                                    item.value.color[1] +
-                                                    " 100%)",
-                                                padding: 8,
-                                                borderRadius: 8,
-                                                color: "white",
-                                            }}
-                                        >
-                                            <p style={{ fontWeight: "bolder" }}>{label}</p>
-                                        </div>
-                                    );
-                                }}
-                                renderValue={(value: CalendarData, item: any) => {
-                                    return (
-                                        <div
-                                            style={{
-                                                backgroundImage:
-                                                    "linear-gradient(315deg, " +
-                                                    item.value.color[0] +
-                                                    " 0%, " +
-                                                    item.value.color[1] +
-                                                    " 100%)",
-                                                padding: 8,
-                                                borderRadius: 8,
-                                                color: "white",
-                                            }}
-                                        >
-                                            <p style={{ fontWeight: "bolder" }}>{value.title}</p>
-                                        </div>
-                                    );
-                                }}
+                                renderMenuItem={(label: ReactNode, item: ItemDataType) => get_calendar_menu_item(label, item)}
+                                renderValue={(value: CalendarData, item: any) => get_calendar_menu_value(value, item)}
                             />
-                        </FormGroup>
-                        <FormGroup>
-                            <ControlLabel>待辦事項標題</ControlLabel>
-                            <FormControl name="title" accepter={AutoComplete} className="DialogFormControl" autoComplete="off" />
+                            <FormControl
+                                className="DialogFormControl"
+                                placeholder="Deadline 標題"
+                                name="title"
+                                accepter={AutoComplete}
+                                autoComplete="off"
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>Deadline</ControlLabel>
@@ -173,8 +159,15 @@ class CreateTodoDialog extends React.Component<Props, States> {
                             />
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>補充敘述</ControlLabel>
-                            <FormControl name="description" accepter={AutoComplete} className="DialogFormControl" autoComplete="off" />
+                            <ControlLabel>註記</ControlLabel>
+                            <FormControl
+                                className="DialogFormControl"
+                                name="description"
+                                accepter={Input}
+                                componentClass="textarea"
+                                rows={3}
+                                autoComplete="off"
+                            />
                         </FormGroup>
                     </Form>
                 </Modal.Body>
