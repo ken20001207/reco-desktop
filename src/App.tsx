@@ -46,6 +46,8 @@ class index extends React.Component<Props, IndexStates> {
     }
 
     async handleDayClick(day: Date) {
+        if (store.getState().systemStateReducer.events.filter((event) => event.startTime.getMonth() === day.getMonth()).length === 0)
+            download_data(day.getFullYear(), day.getMonth() + 1);
         this.setState({
             selectedDay: day,
         });
