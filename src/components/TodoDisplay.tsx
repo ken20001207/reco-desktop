@@ -6,6 +6,7 @@ import { toggleCreatingTodo } from "../redux/actions";
 import { connect } from "react-redux";
 import { Panel, Icon } from "rsuite";
 import { TodoData, AppState } from "../types";
+import get_day_diff from "../utils/get_day_diff";
 
 interface todoDisplayProps {
     todos: Array<TodoData>;
@@ -17,10 +18,7 @@ interface todoDisplayProps {
 class TodoDisplay extends React.Component<todoDisplayProps> {
     render() {
         var display_todos = this.props.todos.filter((todo) => {
-            return (
-                (todo.deadline.getTime() - this.props.displayDate.getTime()) / 86400000 < 3 &&
-                todo.deadline.getTime() - this.props.displayDate.getTime() > 0
-            );
+            return get_day_diff(todo.deadline, this.props.displayDate) < 3 && get_day_diff(todo.deadline, this.props.displayDate) >= 0;
         });
         display_todos.sort((todoA, todoB) => (todoA.complete ? 1 : 0) - (todoB.complete ? 1 : 0));
         var todos = display_todos.map((todo) => {
