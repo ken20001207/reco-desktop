@@ -21,10 +21,10 @@ import { connect } from "react-redux";
 import { fix_todo_time } from "../utils/fix_time";
 import update_todo from "../utils/update_todo";
 import download_data from "../utils/download_datas";
-import { Notification } from "rsuite";
-import { generateUUID } from "../utils/generateUUID";
+import generateUUID from "../utils/generateUUID";
 import get_calendar_menu_item from "./calendar_menu_item";
 import get_calendar_menu_value from "./calendar_menu_value";
+import { send_success_message, send_error_message } from "./send_message";
 
 interface Props {
     creatingTodo: boolean;
@@ -89,20 +89,12 @@ class CreateTodoDialog extends React.Component<Props, States> {
                     .then(() => {
                         this.props.toggleCreatingTodo();
                         this.setState({ loading: false });
-                        Notification["success"]({
-                            title: "更新成功",
-                            description: <p>你剛剛創立了一項新的事件</p>,
-                            placement: "bottomStart",
-                        });
+                        send_success_message("建立成功", "「" + this.state.title + "」建立成功");
                     })
                     .catch((err) => {
                         this.props.toggleCreatingTodo();
                         this.setState({ loading: false });
-                        Notification["error"]({
-                            title: "下載行事曆資料失敗",
-                            description: <p>{err}</p>,
-                            placement: "bottomStart",
-                        });
+                        send_error_message("下載行事曆資料失敗", err);
                     });
             }
         });

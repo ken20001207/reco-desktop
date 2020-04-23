@@ -1,5 +1,5 @@
 /** 產生一組 UUID 給任意物件使用 */
-export function generateUUID() {
+export default function generateUUID() {
     var d = Date.now();
     if (typeof performance !== "undefined" && typeof performance.now === "function") {
         d += performance.now();

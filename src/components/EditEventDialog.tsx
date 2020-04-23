@@ -8,8 +8,8 @@ import update_event from "../utils/update_event";
 import { fix_event_time } from "../utils/fix_time";
 import download_data from "../utils/download_datas";
 
-import { Notification } from "rsuite";
 import delete_item from "../utils/delete_item";
+import { send_success_message, send_error_message } from "./send_message";
 
 interface Props {
     event: EventData | null;
@@ -89,20 +89,11 @@ class EditEventDialog extends React.Component<Props, State> {
                     .then(() => {
                         this.props.toggleEditingEvent();
                         this.setState({ loading: false });
-                        Notification["success"]({
-                            title: "更新成功",
-                            description: <p>你剛剛更新了一項事件的資訊</p>,
-                            placement: "bottomStart",
-                        });
+                        send_success_message("更新成功", "「" + this.props.event?.title + "」已被更新");
                     })
-                    .catch((err) => {
+                    .catch(() => {
                         this.props.toggleEditingEvent();
                         this.setState({ loading: false });
-                        Notification["error"]({
-                            title: "下載行事曆資料失敗",
-                            description: <p>{err}</p>,
-                            placement: "bottomStart",
-                        });
                     });
             }
         });
@@ -120,28 +111,15 @@ class EditEventDialog extends React.Component<Props, State> {
                                 this.props.deleteEvent(this.props.event?._id);
                             this.props.toggleEditingEvent();
                             this.setState({ removing: false });
-                            Notification["success"]({
-                                title: "刪除成功",
-                                description: <p>成功刪除了一項事件</p>,
-                                placement: "bottomStart",
-                            });
+                            send_success_message("刪除成功", "「" + this.props.event?.title + "」已被刪除");
                         })
-                        .catch((err) => {
+                        .catch(() => {
                             this.props.toggleEditingEvent();
                             this.setState({ removing: false });
-                            Notification["error"]({
-                                title: "下載行事曆資料失敗",
-                                description: <p>{err}</p>,
-                                placement: "bottomStart",
-                            });
                         });
             })
             .catch((err) => {
-                Notification["error"]({
-                    title: "刪除失敗",
-                    description: <p>{err}</p>,
-                    placement: "bottomStart",
-                });
+                send_error_message("刪除失敗", err);
             });
     }
 

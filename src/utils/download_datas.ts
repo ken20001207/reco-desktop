@@ -2,6 +2,7 @@ import { apiURL } from "../config";
 import { EventData, TodoData } from "../types";
 import { store } from "../redux/store";
 import { updateEvent, updateTodo } from "../redux/actions";
+import { send_error_message } from "../components/send_message";
 
 export default function download_data(year: number, month: number) {
     return new Promise<any>((resolve, reject) => {
@@ -29,6 +30,7 @@ export default function download_data(year: number, month: number) {
                 resolve();
             })
             .catch((err) => {
+                send_error_message("下載資料時發生了錯誤", err);
                 reject(err);
             });
     });

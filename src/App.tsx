@@ -8,7 +8,6 @@ import EditEventDialog from "./components/EditEventDialog";
 import CreateEventDialog from "./components/CreateEventDialog";
 
 import { Loader, Row, Grid } from "rsuite";
-import { Notification } from "rsuite";
 import "rsuite/dist/styles/rsuite-dark.css";
 import "./App.css";
 import "./style/style.css";
@@ -20,6 +19,7 @@ import { updateUser, updateCalendar } from "./redux/actions";
 import { UserData, CalendarData, SystemState } from "./types";
 import download_data from "./utils/download_datas";
 import { getDayDescription } from "./utils/getDayDescription";
+import { send_success_message, send_info_message } from "./components/send_message";
 
 interface IndexStates {
     selectedDay: Date;
@@ -62,11 +62,7 @@ class index extends React.Component<Props, IndexStates> {
         check_session().then(async (res) => {
             if (res.status === 200) {
                 // 登入成功
-                Notification["success"]({
-                    title: "Session 登入成功",
-                    description: <p>已經使用 Session 完成自動登入</p>,
-                    placement: "bottomStart",
-                });
+                send_success_message("Session 登入成功", "已經使用 Session 完成自動登入");
 
                 // 保存 User Data
                 const userdata = ((await res.json()) as unknown) as { calendars: Array<CalendarData>; user: UserData };
@@ -83,11 +79,7 @@ class index extends React.Component<Props, IndexStates> {
                 const today = new Date();
                 download_data(today.getFullYear(), today.getMonth() + 1);
             } else {
-                Notification["info"]({
-                    title: "登入狀態已經過期",
-                    description: <p>登入功能尚未實現，敬請期待</p>,
-                    placement: "bottomStart",
-                });
+                send_info_message("登入狀態已經過期", "登入功能尚未實現，敬請期待");
             }
         });
     }
