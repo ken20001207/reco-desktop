@@ -5,6 +5,7 @@ import { TodoData } from "../types";
 import { store } from "../redux/store";
 import { toggleEditingTodo, selectTodo } from "../redux/actions";
 import { connect } from "react-redux";
+import { getDayDescription } from "../utils/getDayDescription";
 
 interface TodoCardProps {
     position: number | undefined;
@@ -70,14 +71,7 @@ class TodoCard extends React.Component<TodoCardProps, TodoCardState> {
                 <div style={{ display: "inline-block", height: 60, verticalAlign: "top", paddingLeft: 16, paddingTop: 12 }}>
                     <p style={{ fontSize: 12, fontWeight: "bolder" }}>{todo.title}</p>
                     <p style={{ fontSize: 12, fontWeight: "bolder", opacity: 0.5 }}>
-                        {todo.deadline.getMonth() +
-                            1 +
-                            "/" +
-                            todo.deadline.getDate() +
-                            " " +
-                            todo.deadline.getHours() +
-                            ":" +
-                            todo.deadline.getMinutes()}{" "}
+                        {getDayDescription(todo.deadline)}
                         截止
                     </p>
                 </div>
