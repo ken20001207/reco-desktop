@@ -27,7 +27,7 @@
     "scripts": {
         "react-start": "react-scripts start",
         "react-build": "react-scripts build",
-        "electron-build": "tsc electron.ts && cp electron.js ./public/electron.js",
+        "electron-build": "tsc electron.ts && cp electron.js ./public/electron.js && rm electron.js",
         "electron-start": "concurrently \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
         "dist": "react-scripts build && electron-builder ./build/electron.js"
     },

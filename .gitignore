@@ -3,4 +3,4 @@ build
 .DS_Store
 package-lock.json
 yarn.lock
-electron.js
+./electron.js
