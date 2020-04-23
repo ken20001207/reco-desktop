@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete } from "rsuite";
+import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete, Input } from "rsuite";
 import { store } from "../redux/store";
 import { AppState, TodoData, CalendarData } from "../types";
 import { connect } from "react-redux";
@@ -143,8 +143,15 @@ class EditTodoDialog extends React.Component<Props, States> {
                             />
                         </FormGroup>
                         <FormGroup>
-                            <ControlLabel>補充敘述</ControlLabel>
-                            <FormControl name="description" accepter={AutoComplete} className="DialogFormControl" autoComplete="off" />
+                            <ControlLabel>註記</ControlLabel>
+                            <FormControl
+                                className="DialogFormControl"
+                                name="description"
+                                accepter={Input}
+                                componentClass="textarea"
+                                rows={3}
+                                autoComplete="off"
+                            />
                         </FormGroup>
                         <FormGroup>
                             <ControlLabel>已完成</ControlLabel>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete } from "rsuite";
+import { Button, FlexboxGrid, Form, FormGroup, FormControl, ControlLabel, Modal, Toggle, DatePicker, AutoComplete, Input } from "rsuite";
 import { store } from "../redux/store";
 import { toggleEditingEvent, deleteEvent } from "../redux/actions";
 import { connect } from "react-redux";
@@ -134,6 +134,7 @@ class EditEventDialog extends React.Component<Props, State> {
             ) : (
                 <p />
             );
+            /** 時間選項 */
             var time = <p />;
             if (!this.state.allDay)
                 time = (
@@ -156,8 +157,16 @@ class EditEventDialog extends React.Component<Props, State> {
                                 accepter={DatePicker}
                                 format="YYYY年MM月DD日 HH點mm分"
                                 placement="rightEnd"
+                                disabledDate={(date: Date | undefined) => (date ? date.getTime() < this.state.startTime.getTime() : false)}
                             />
                         </FormGroup>
+                    </FormGroup>
+                );
+            else
+                time = (
+                    <FormGroup>
+                        <ControlLabel>日期</ControlLabel>
+                        <FormControl className="DialogFormControl" name="startTime" accepter={DatePicker} format="YYYY年MM月DD日" oneTap />
                     </FormGroup>
                 );
             return (
@@ -178,23 +187,20 @@ class EditEventDialog extends React.Component<Props, State> {
                                 <FormControl name="title" accepter={AutoComplete} className="DialogFormControl" autoComplete="off" />
                             </FormGroup>
                             <FormGroup>
-                                <ControlLabel>日期</ControlLabel>
-                                <FormControl
-                                    name="startTime"
-                                    accepter={DatePicker}
-                                    format="YYYY年MM月DD日"
-                                    className="DialogFormControl"
-                                    oneTap
-                                />
-                            </FormGroup>
-                            <FormGroup>
                                 <ControlLabel>全天事件</ControlLabel>
-                                <FormControl accepter={Toggle} name="allday" checked={this.state.allDay} />
+                                <FormControl accepter={Toggle} name="allDay" checked={this.state.allDay} />
                             </FormGroup>
                             {time}
                             <FormGroup>
-                                <ControlLabel>詳細敘述</ControlLabel>
-                                <FormControl name="description" accepter={AutoComplete} className="DialogFormControl" />
+                                <ControlLabel>註記</ControlLabel>
+                                <FormControl
+                                    className="DialogFormControl"
+                                    name="description"
+                                    accepter={Input}
+                                    componentClass="textarea"
+                                    rows={3}
+                                    autoComplete="off"
+                                />
                             </FormGroup>
                             <FormGroup>
                                 <ControlLabel>地點</ControlLabel>
