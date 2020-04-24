@@ -6,7 +6,7 @@ import { send_error_message } from "../components/send_message";
 
 export default function download_data(year: number, month: number) {
     return new Promise<any>((resolve, reject) => {
-        fetch(apiURL + "/getdata?year=" + year + "&month=" + month, { method: "GET", headers: { session: "samplesession" } })
+        fetch(apiURL + "/getdata?year=" + year + "&month=" + month, { method: "GET", headers: { Authorization: "samplesession" } })
             .then(async (res) => {
                 const datas = ((await res.json()) as unknown) as { events: Array<EventData>; todos: Array<TodoData> };
                 datas.events.map((event) => {
