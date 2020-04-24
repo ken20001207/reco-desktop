@@ -1,0 +1,61 @@
+### Localhost Session Check
+POST http://reco-backend.linyuanlin.com/checksession
+Authorization: samplesession
+
+
+### Localhost Write Event
+POST http://reco-backend.linyuanlin.com/write-event
+Authorization: samplesession
+Content-Type: application/json
+
+{
+    "event": {
+        "_id": "8c6058ce-7e72-46ad-887d-4f5393b4627e",
+        "calendar": "f05dbb91-b707-48b1-a7bc-2afcd1dcf740",
+        "title": "法學基礎 / 大學物理基礎 I",
+        "color": [
+            "#FFAF3A",
+            "#8E5800"
+        ],
+        "ignore": false,
+        "ignoreReason": "",
+        "startTime": "2020-04-21T13:15:00.000Z",
+        "endTime": "2020-04-21T15:40:00.000Z",
+        "description": "",
+        "location": "",
+        "repeatID": "0132531f-c282-4297-9715-748e97689927"
+    }
+}
+
+### Localhost Write Todo
+POST http://reco-backend.linyuanlin.com/write-todo
+Authorization: samplesession
+Content-Type: application/json
+
+{
+    "todo": {
+        "complete": true,
+        "title": "預約北村豆腐家 午餐",
+        "color": [
+            "#fd3721",
+            "#b721ff"
+        ],
+        "deadline": "2020-04-07T15:59:00",
+        "calendar": "f05dbb91-b707-48b1-a7bc-2afcd1dcf740",
+        "_id": "391d2140-f4c9-4ecd-ae1d-dc2f790faff8",
+        "description": ""
+    }
+}
+
+### Localhost Delete Item
+POST http://reco-backend.linyuanlin.com/delete-item
+Authorization: samplesession
+Content-Type: application/json
+
+{
+    "_id": "0238af30-99ec-48e4-80da-539192539bc6"
+}
+
+### Localhost Get Data by Month
+GET http://lreco-backend.linyuanlin.com/getdata?year=2020&month=4
+Authorization: samplesession
