@@ -3,8 +3,10 @@ import { EventData, TodoData } from "../types";
 import { store } from "../redux/store";
 import { updateEvent, updateTodo } from "../redux/actions";
 import { send_error_message } from "../components/send_message";
+import { Alert } from "rsuite";
 
 export default function download_data(year: number, month: number) {
+    Alert.info("正在同步" + year + "年" + month + "月的資料", 0);
     return new Promise<any>((resolve, reject) => {
         fetch(apiURL + "/getdata?year=" + year + "&month=" + month, { method: "GET", headers: { Authorization: "samplesession" } })
             .then(async (res) => {
@@ -27,6 +29,7 @@ export default function download_data(year: number, month: number) {
                     store.dispatch(updateTodo(todo));
                     return null;
                 });
+                Alert.close();
                 resolve();
             })
             .catch((err) => {
