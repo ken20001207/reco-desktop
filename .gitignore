@@ -7,6 +7,9 @@ build
 # release files
 dist
 
+# editor settings
+.vscode
+
 # lock files
 package-lock.json
 yarn.lock
