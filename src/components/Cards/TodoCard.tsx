@@ -25,23 +25,20 @@ class TodoCard extends React.Component<TodoCardProps, TodoCardState> {
         this.state = {
             hover: false,
         };
-        this.handleMouseEnter = this.handleMouseEnter.bind(this);
-        this.handleMouseLeave = this.handleMouseLeave.bind(this);
-        this.handleClick = this.handleClick.bind(this);
     }
 
-    handleClick(e: { stopPropagation: () => void }) {
+    handleClick = (e: { stopPropagation: () => void }) => {
         e.stopPropagation();
         this.props.toggleEditingTodo(this.props.todo);
-    }
+    };
 
-    handleMouseEnter() {
+    handleMouseEnter = () => {
         this.setState({ hover: true });
-    }
+    };
 
-    handleMouseLeave() {
+    handleMouseLeave = () => {
         this.setState({ hover: false });
-    }
+    };
 
     render() {
         const todo = this.props.todo;

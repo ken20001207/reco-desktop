@@ -31,13 +31,6 @@ interface States {
 }
 
 class EditTodoModal extends React.Component<Props, States> {
-    constructor(props: Props) {
-        super(props);
-        this.handleInput = this.handleInput.bind(this);
-        this.updateTodo = this.updateTodo.bind(this);
-        this.deleteItem = this.deleteItem.bind(this);
-    }
-
     componentWillReceiveProps(nextProps: Props) {
         if (nextProps.todo !== null) {
             const calendar = store
@@ -57,7 +50,7 @@ class EditTodoModal extends React.Component<Props, States> {
         }
     }
 
-    handleInput(formValue: any) {
+    handleInput = (formValue: any) => {
         this.setState({
             calendarData: formValue.calendarData,
             title: formValue.title,
@@ -66,9 +59,9 @@ class EditTodoModal extends React.Component<Props, States> {
             complete: formValue.complete,
             description: formValue.description,
         });
-    }
+    };
 
-    updateTodo() {
+    updateTodo = () => {
         this.setState({ loading: true });
         update_todo(fix_todo_time((this.state as unknown) as TodoData)).then(async (res) => {
             if (res.status === 200) {
@@ -84,9 +77,9 @@ class EditTodoModal extends React.Component<Props, States> {
                     });
             }
         });
-    }
+    };
 
-    deleteItem() {
+    deleteItem = () => {
         this.setState({ removing: true });
         if (this.props.todo === null) return;
         delete_item(this.props.todo._id)
@@ -109,7 +102,7 @@ class EditTodoModal extends React.Component<Props, States> {
                 this.props.toggleEditingTodo();
                 send_error_message("刪除失敗", "刪除 DeadLine 時發生了錯誤");
             });
-    }
+    };
 
     render() {
         const selectedTodo = store.getState().systemStateReducer.UI.selectedTodo;

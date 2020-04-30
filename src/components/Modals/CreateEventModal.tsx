@@ -69,15 +69,13 @@ class CreateEventModal extends React.Component<Props, States> {
             ignoreReason: "",
             repeatID: "",
         };
-        this.handleInput = this.handleInput.bind(this);
-        this.createEvent = this.createEvent.bind(this);
     }
 
     componentWillReceiveProps() {
         this.setState({ calendarData: store.getState().systemStateReducer.calendars[0] });
     }
 
-    handleInput(formValue: any) {
+    handleInput = (formValue: any) => {
         this.setState({
             calendarData: formValue.calendarData,
             ignore: formValue.ignore,
@@ -89,9 +87,9 @@ class CreateEventModal extends React.Component<Props, States> {
             location: formValue.location,
             ignoreReason: formValue.ignoreReason,
         });
-    }
+    };
 
-    createEvent() {
+    createEvent = () => {
         if (this.state.calendarData._id === undefined || this.state.calendarData.color === undefined) return;
         this.setState({ loading: true });
         var newEvent = fix_event_time((this.state as unknown) as EventData);
@@ -113,7 +111,7 @@ class CreateEventModal extends React.Component<Props, States> {
                     });
             }
         });
-    }
+    };
 
     render() {
         /** 時間選項 */

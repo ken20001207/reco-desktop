@@ -57,11 +57,9 @@ class CreateTodoModal extends React.Component<Props, States> {
             complete: false,
             description: "",
         };
-        this.handleInput = this.handleInput.bind(this);
-        this.createTodo = this.createTodo.bind(this);
     }
 
-    handleInput(formValue: any) {
+    handleInput = (formValue: any) => {
         this.setState({
             calendarData: formValue.calendarData,
             title: formValue.title,
@@ -70,13 +68,13 @@ class CreateTodoModal extends React.Component<Props, States> {
             complete: formValue.complete,
             description: formValue.description,
         });
-    }
+    };
 
     componentWillReceiveProps() {
         this.setState({ calendarData: store.getState().systemStateReducer.calendars[0] });
     }
 
-    createTodo() {
+    createTodo = () => {
         if (this.state.calendarData._id === undefined || this.state.calendarData.color === undefined) return;
         this.setState({ loading: true });
         var newTodo = fix_todo_time((this.state as unknown) as TodoData);
@@ -98,7 +96,7 @@ class CreateTodoModal extends React.Component<Props, States> {
                     });
             }
         });
-    }
+    };
 
     render() {
         var calendarOptions: Array<{ label: string; value: CalendarData }> = [];

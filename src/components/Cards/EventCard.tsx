@@ -22,29 +22,25 @@ class EventCard extends React.Component<EventCardProps, { hover: boolean }> {
         this.state = {
             hover: false,
         };
-        this.handleClick = this.handleClick.bind(this);
-        this.handleMouseEnter = this.handleMouseEnter.bind(this);
-        this.handleMouseLeave = this.handleMouseLeave.bind(this);
-        this.handleDoubleClick = this.handleDoubleClick.bind(this);
     }
 
-    handleClick(e: { stopPropagation: () => void }) {
+    handleClick = (e: { stopPropagation: () => void }) => {
         e.stopPropagation();
         this.trigger.show();
-    }
+    };
 
-    handleDoubleClick(e: { stopPropagation: () => void }) {
+    handleDoubleClick = (e: { stopPropagation: () => void }) => {
         e.stopPropagation();
         this.props.toggleEditingEvent(this.props.event);
-    }
+    };
 
-    handleMouseEnter() {
+    handleMouseEnter = () => {
         this.setState({ hover: true });
-    }
+    };
 
-    handleMouseLeave() {
+    handleMouseLeave = () => {
         this.setState({ hover: false });
-    }
+    };
 
     render() {
         const event = this.props.event;

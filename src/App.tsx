@@ -1,25 +1,37 @@
 import React from "react";
-import DayPicker from "react-day-picker";
 
+/** View Components */
 import DayView from "./components/Views/DayView";
 import AllDayEvents from "./components/Views/AllDayEvents";
 import TodoDisplay from "./components/Views/TodoDisplay";
+
+/** Modal Components */
 import EditEventDialog from "./components/Modals/EditEventModal";
 import CreateEventDialog from "./components/Modals/CreateEventModal";
+import CreateTodoDialog from "./components/Modals/CreateTodoModal";
+import EditTodoDialog from "./components/Modals/EditTodoModal";
 
+/** Other Components */
+import { send_success_message, send_info_message } from "./components/send_message";
 import { Loader, Row, Grid } from "rsuite";
+import DayPicker from "react-day-picker";
+
+/** Styles */
 import "rsuite/dist/styles/rsuite-dark.css";
 import "./App.css";
 import "./style/style.css";
-import CreateTodoDialog from "./components/Modals/CreateTodoModal";
-import EditTodoDialog from "./components/Modals/EditTodoModal";
+
+/** Utils */
 import check_session from "./utils/check_session";
-import { store } from "./redux/store";
-import { updateUser, updateCalendar } from "./redux/actions";
-import { UserData, CalendarData } from "./types";
 import download_data from "./utils/download_datas";
 import { getDayDescription } from "./utils/getDayDescription";
-import { send_success_message, send_info_message } from "./components/send_message";
+
+/** Redux */
+import { store } from "./redux/store";
+import { updateUser, updateCalendar } from "./redux/actions";
+
+/** Types */
+import { UserData, CalendarData } from "./types";
 
 interface IndexStates {
     selectedDay: Date;
@@ -38,18 +50,16 @@ class index extends React.Component<Props, IndexStates> {
             screenWidth: 1800,
             screenHeight: 600,
         };
-        this.handleDayClick = this.handleDayClick.bind(this);
-        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.dayviewContainer = React.createRef<HTMLDivElement>();
     }
 
-    async handleDayClick(day: Date) {
+    handleDayClick = async (day: Date) => {
         if (store.getState().systemStateReducer.events.filter((event) => event.startTime.getMonth() === day.getMonth()).length === 0)
             download_data(day.getFullYear(), day.getMonth() + 1);
         this.setState({
             selectedDay: day,
         });
-    }
+    };
 
     componentDidMount() {
         // screen Size Listener
@@ -82,9 +92,9 @@ class index extends React.Component<Props, IndexStates> {
         });
     }
 
-    updateWindowDimensions() {
+    updateWindowDimensions = () => {
         this.setState({ screenWidth: window.innerWidth, screenHeight: window.innerHeight });
-    }
+    };
 
     render() {
         var AllDayEventsContent = <Loader />;

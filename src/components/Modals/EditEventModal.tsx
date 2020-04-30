@@ -37,13 +37,6 @@ interface State {
 }
 
 class EditEventModal extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.handleInput = this.handleInput.bind(this);
-        this.updateEvent = this.updateEvent.bind(this);
-        this.deleteItem = this.deleteItem.bind(this);
-    }
-
     componentWillReceiveProps(nextProps: Props) {
         if (nextProps.event !== null) {
             const calendarTitle = store
@@ -67,7 +60,7 @@ class EditEventModal extends React.Component<Props, State> {
         }
     }
 
-    handleInput(formValue: any) {
+    handleInput = (formValue: any) => {
         if (this.props.event === null) return;
         this.setState({
             ignore: formValue.ignore,
@@ -79,9 +72,9 @@ class EditEventModal extends React.Component<Props, State> {
             location: formValue.location,
             ignoreReason: formValue.ignoreReason,
         });
-    }
+    };
 
-    updateEvent() {
+    updateEvent = () => {
         this.setState({ loading: true });
         update_event(fix_event_time((this.state as unknown) as EventData)).then(async (res) => {
             if (res.status === 200) {
@@ -97,9 +90,9 @@ class EditEventModal extends React.Component<Props, State> {
                     });
             }
         });
-    }
+    };
 
-    deleteItem() {
+    deleteItem = () => {
         if (this.props.event === null) return;
         this.setState({ removing: true });
         delete_item(this.props.event._id)
@@ -121,7 +114,7 @@ class EditEventModal extends React.Component<Props, State> {
             .catch((err) => {
                 send_error_message("刪除失敗", err);
             });
-    }
+    };
 
     render() {
         if (this.props.event !== null) {
