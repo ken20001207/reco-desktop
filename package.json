@@ -26,7 +26,7 @@
     },
     "scripts": {
         "build": "tsc electron.ts && cp electron.js ./public/electron.js && rm electron.js",
-        "dev": "concurrently \"BROWSER=none react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
+        "dev": "concurrently \"BROWSER=none react-scripts start\" \"wait-on http://localhost:3000 && electron --enable-transparent-visuals .\"",
         "dist": "react-scripts build && electron-builder ./build/electron.js"
     },
     "eslintConfig": {

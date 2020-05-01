@@ -109,24 +109,27 @@ class index extends React.Component<Props, IndexStates> {
 
         return (
             <div>
-                <div className="DragBar" style={{ width: "100%", position: "fixed", top: 0, left: 0, height: 30 }}></div>
-
+                <div className="DragBar" style={{ width: "100%", position: "fixed", top: 0, left: 0, height: 30 }} />
                 <Grid style={{ width: "100%", height: this.state.screenHeight }}>
                     <div
                         className="FixedWidthCol"
                         style={{
                             width: 320,
                             height: this.state.screenHeight,
-                            backgroundColor: "rgb(30,30,30)",
                             paddingLeft: 36,
                             paddingRight: 36,
                             paddingTop: 80,
                         }}
                     >
-                        <Row>{dayDescription}</Row>
+                        <Row>
+                            <p style={{ fontSize: 24, display: "inline-block", fontWeight: "bolder" }}>
+                                Reco <p style={{ fontSize: 14, display: "inline-block", fontWeight: "bolder" }}>Beta</p>
+                            </p>
+                        </Row>
                         <Row style={{ marginTop: 40 }}>
                             <DayPicker selectedDays={this.state.selectedDay} onDayClick={this.handleDayClick} />
                         </Row>
+                        <Row>{dayDescription}</Row>
                         <Row>
                             <div className="day-view-panel">
                                 <div className="day-view-scroll">
