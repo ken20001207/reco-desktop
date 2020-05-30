@@ -1,3 +1,5 @@
+![logo](./images/logo.png)
+
 ## Introduction
 
 Reco is a cross platform calendar app which focus on User Experience. Made by Yuanlin Lin.
@@ -16,6 +18,10 @@ Start the React application and open an electron window for development.
 ### `yarn dist`
 
 Using electron builder to package the application.
+
+## Screenshot
+
+![preview](images/1.png)
 
 ## Fix Icon
 
